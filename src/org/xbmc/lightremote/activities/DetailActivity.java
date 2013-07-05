@@ -3,14 +3,10 @@ package org.xbmc.lightremote.activities;
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.data.Movie;
 import org.xbmc.lightremote.data.PlayingProperties;
-import org.xbmc.lightremote.fragments.LibraryMoviesFragment;
 import org.xbmc.lightremote.http.IServiceDelegate;
 import org.xbmc.lightremote.http.services.PlayerService;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
@@ -50,19 +46,6 @@ public class DetailActivity extends Activity implements OnClickListener, IServic
 			break;
 		}
 	}
-
-//	@Override
-//	public void onActionError(int action, String message) {
-//	}
-//
-//	@Override
-//	public void onActionCompleted(int action) {
-//		switch (action) {
-//			case PlayerService.ACTION_OPEN:
-//				mService.getPlaying();
-//				break;
-//		}
-//	}
 
 	@Override
 	public void onGetPlaying(Movie movie) {

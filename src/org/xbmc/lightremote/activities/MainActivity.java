@@ -1,16 +1,8 @@
 package org.xbmc.lightremote.activities;
 
 import org.xbmc.lightremote.R;
-import org.xbmc.lightremote.R.id;
-import org.xbmc.lightremote.R.layout;
-import org.xbmc.lightremote.R.menu;
-import org.xbmc.lightremote.R.string;
 import org.xbmc.lightremote.fragments.LibraryMoviesFragment;
 import org.xbmc.lightremote.fragments.PlayingFragment;
-import org.xbmc.lightremote.http.HttpTask;
-import org.xbmc.lightremote.http.TestDelegate;
-import org.xbmc.lightremote.http.tasks.LibraryGetMoviesTask;
-
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -18,11 +10,9 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 public class MainActivity extends SlidingFragmentActivity implements OnClickListener {
@@ -44,56 +33,27 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		
+		// Configure ActionBar
 		ActionBar bar = getActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
 		
-		
+		// Configure SlidingMenu
 		SlidingMenu menu = getSlidingMenu();
-        //menu.setMode(SlidingMenu.LEFT);
         menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-//        menu.setShadowWidthRes(R.dimen.shadow_width);
-//        menu.setShadowDrawable(R.drawable.shadow);
-//        menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-        //menu.setFadeDegree(0.35f);
-        //menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-        //menu.setMenu(R.layout.menu);
         menu.setBehindOffset(150);
-        //menu.setAboveOffset(100);
-        //menu.setBehindWidth(500);
         menu.setShadowWidth(30);
 		menu.setBehindScrollScale(0.25f);
-		
 		setBehindContentView(R.layout.menu);
-		
 		findViewById(R.id.bt_playing).setOnClickListener(this);
 		findViewById(R.id.bt_library_movies).setOnClickListener(this);
 		findViewById(R.id.bt_library_series).setOnClickListener(this);
 
+		// Initialize first fragment
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		FragmentTransaction ft = fragmentManager.beginTransaction();
 		ft.replace(R.id.layout_main, new LibraryMoviesFragment());
 		ft.commit();
-		
-//		// Create the adapter that will return a fragment for each of the three
-//		// primary sections of the app.
-//		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-//
-//		// Set up the ViewPager with the sections adapter.
-//		mViewPager = (ViewPager) findViewById(R.id.pager);
-//		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
-
-
-//	@Override
-//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//		if (resultCode == 1) {
-//			FragmentManager fragmentManager = getSupportFragmentManager();
-//			FragmentTransaction ft = fragmentManager.beginTransaction();
-//			ft.replace(R.id.layout_main, new PlayingFragment());
-//			ft.commit();
-//		}
-//	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -205,14 +165,12 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			// Create a new TextView and set its text to the fragment's section
 			// number argument value.
 			TextView textView = new TextView(getActivity());
 			textView.setGravity(Gravity.CENTER);
-			textView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
+			textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
 			return textView;
 		}
 	}
