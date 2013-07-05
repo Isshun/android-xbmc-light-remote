@@ -1,0 +1,17 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="1" >
+        <CheckBoxPreference
+            android:key="checkbox_preference"
+            android:summary="1"
+            android:title="1" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="1" >
+        <EditTextPreference
+            android:dialogTitle="1"
+            android:key="password"
+            android:summary="1"
+            android:title="password" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
