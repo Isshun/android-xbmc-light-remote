@@ -16,6 +16,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xbmc.lightremote.App;
 
 public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
@@ -25,14 +27,18 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 	private int 						mId;
 	private boolean 					mComplete;
 	protected IWebserviceTaskDelegate 	mDelegate;
-	protected String 					mJson;
-	private int mStatusCode;
+	protected JSONObject 				mJson;
+	private int 						mStatusCode;
 	
 	public HttpTask(IWebserviceTaskDelegate delegate, int id) {
 		mDelegate = delegate;
 		mId = id;
 		
-		Log.i(App.APP_NAME, "new WebserviceTask");
+		//Log.i(App.APP_NAME, "new WebserviceTask");
+	}
+	
+	public IWebserviceTaskDelegate getDelegate() {
+		return mDelegate;
 	}
 
 	/**
@@ -47,16 +53,21 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 	 */
 	// TODO: Use HttpURLConnection instead DefaultHttpClient
 	protected Boolean doInBackground(String... params) {
-		Log.i(App.APP_NAME, "WebserviceTask: " + params[0]);
+		Log.d(App.APP_NAME, "New task: " + params[0]);
 		
-	    StringBuilder sb = new StringBuilder();
-
+		String cmd = null;
+		if (params.length == 3 && params[2] != null) {
+			cmd = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"%s\", \"id\": \"%s\", \"params\": %s}", params[0], params[1], params[2]);
+		} else {
+			cmd = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"%s\", \"id\": \"%s\"}", params[0], params[1]);
+		}
+		
 	    // Create a new HttpClient and Post Header
 	    HttpClient httpclient = new DefaultHttpClient();
 	    httpclient.getParams().setBooleanParameter("http.protocol.expect-continue", false);
         HttpResponse response = null;
 
-		HttpPost httppost = new HttpPost(params[0]);
+		HttpPost httppost = new HttpPost("http://192.168.1.22/jsonrpc");
 		String name = "alex";
 		String password = App.getAppContext().getSharedPreferences(App.APP_NAME, 0).getString("password", null);
 		String auth = "Basic " + Base64.encodeToString((name + ':' + password).getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
@@ -64,12 +75,11 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
     	DefaultHttpClient client = new DefaultHttpClient();
     	
 		try {
-			if (params.length == 2 && params[1] != null) {
-				StringEntity se = new StringEntity(params[1]);
+				StringEntity se = new StringEntity(cmd);
 				se.setContentType("text/plain");
 				httppost.setHeader("Content-Type","application/json");
 				httppost.setEntity(se);
-			}
+//			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -83,9 +93,13 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        
+        // Get status code
     	mStatusCode = response.getStatusLine().getStatusCode();
     	Log.i(App.APP_NAME, String.format("code: %d", mStatusCode));
 
+    	// Get content
+	    StringBuilder sb = new StringBuilder();
 		try {
 			InputStream is = response.getEntity().getContent();
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8"), 8);
@@ -101,8 +115,20 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 			e.printStackTrace();
 		}
 
-        mJson = sb.toString();
-		Log.d(App.APP_NAME, String.format("JSON: %s", mJson));
+		try {
+			mJson = new JSONObject(sb.toString());
+
+			// API error
+			if (mJson.has("error")) {
+				mErrorMessage = mJson.getJSONObject("error").getString("message");
+				return false;
+			}
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+        Log.v(App.APP_NAME, String.format("Response: %s", sb.toString()));
         
 		return true;
 	}
@@ -135,23 +161,23 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
      */
     protected abstract void onTaskCompleted(Boolean result, String errorMessage, int statusCode);
 
-    public void run(String url) {
-    	run(url, null);
-    }
+//    public void run(String url) {
+//    	run(url, null);
+//    }
     
 	@TargetApi(11)
-    public void run(String url, String login, String pwd) {
+	public void run(String methode, String id) {
 		if (android.os.Build.VERSION.SDK_INT >= 11)
-			this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url, login, pwd);		
+			this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, methode, id);		
 		else
-			this.execute(url, login, pwd);
-    }
-    
+			this.execute(methode, id);
+	}
+
 	@TargetApi(11)
-	public void run(String url, String body) {
+	public void run(String methode, String id, String params) {
 		if (android.os.Build.VERSION.SDK_INT >= 11)
-			this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url, body);		
+			this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, methode, id, params);		
 		else
-			this.execute(url, body);
+			this.execute(methode, id, params);
 	}
 }

@@ -1,18 +1,7 @@
 package org.xbmc.lightremote.http.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.xbmc.lightremote.App;
-import org.xbmc.lightremote.data.Movie;
 import org.xbmc.lightremote.http.HttpTask;
-import org.xbmc.lightremote.http.IPlayerTask;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
-
-import android.util.Log;
 
 public class PlayerOpenTask extends HttpTask {
 
@@ -23,15 +12,9 @@ public class PlayerOpenTask extends HttpTask {
 		
 		mPath = path;
 
-		String cmd = String.format("{ \"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\": { \"file\": \"%s\" } }}", mPath);
-		run("http://192.168.1.22/jsonrpc", cmd);
+		String params = String.format("{ \"item\": { \"file\": \"%s\" } }", mPath);
+		run("Player.Open", "Open", params);
 	}
-	
-//	@Override
-//	public void run(int playerId) {
-//		String cmd = String.format("{ \"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\": { \"file\": \"%s\" } }}", mPath);
-//		run("http://192.168.1.22/jsonrpc", cmd);
-//	}
 
 	@Override
 	protected Boolean doInBackground(String... params) {

@@ -1,14 +1,10 @@
 package org.xbmc.lightremote.http.tasks;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.xbmc.lightremote.App;
 import org.xbmc.lightremote.data.Movie;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 import org.xbmc.lightremote.http.IPlayerTask;
-
-import android.util.Log;
 
 public class PlayerGetCurrentTask extends HttpTask implements IPlayerTask {
 
@@ -16,13 +12,16 @@ public class PlayerGetCurrentTask extends HttpTask implements IPlayerTask {
 	
 	public PlayerGetCurrentTask(IWebserviceTaskDelegate delegate) {
 		super(delegate, 0);
-//		run(\"http://192.168.1.22/jsonrpc\", "{\"jsonrpc\": \"2.0\", \"method\": \"VideoLibrary.GetMovies\", \"params\": { \"filter\": {\"field\": \"playcount\", \"operator\": \"is\", \"value\": \"0\"}, \"limits\": { \"start\" : 0, \"end\": 75 }, \"properties\" : [\"art\", \"rating\", \"thumbnail\", \"playcount\", \"file\"], \"sort\": { \"order\": \"ascending\", \"method\": \"label\", \"ignorearticle\": true } }, \"id\": \"libMovies\"}");
-		
 	}
 	
 	public void run(int playerId) {
-		String cmd = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetItem\", \"params\": { \"properties\": [\"title\", \"album\", \"artist\", \"season\", \"episode\", \"duration\", \"showtitle\", \"tvshowid\", \"thumbnail\", \"file\", \"fanart\", \"streamdetails\"], \"playerid\": %d }, \"id\": \"VideoGetItem\"}", playerId);
-		run("http://192.168.1.22/jsonrpc", cmd);
+		if (playerId == 0) {
+			mDelegate.onTaskCompleted(this, null);
+			return;
+		}
+
+		String params = String.format("{ \"properties\": [\"title\", \"album\", \"artist\", \"season\", \"episode\", \"duration\", \"showtitle\", \"tvshowid\", \"thumbnail\", \"file\", \"fanart\", \"streamdetails\"], \"playerid\": %d }", playerId);
+		run("Player.GetItem", "GetItem", params);
 	}
 	
 	@Override
@@ -30,7 +29,7 @@ public class PlayerGetCurrentTask extends HttpTask implements IPlayerTask {
 		if (super.doInBackground(params)) {
 			
 			try {
-				mMovie = Movie.Create((new JSONObject(mJson)).getJSONObject("result").getJSONObject("item"));
+				mMovie = Movie.Create(mJson.getJSONObject("result").getJSONObject("item"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

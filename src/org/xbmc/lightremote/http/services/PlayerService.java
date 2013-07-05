@@ -1,7 +1,5 @@
 package org.xbmc.lightremote.http.services;
 
-import org.xbmc.lightremote.App;
-import org.xbmc.lightremote.activities.DetailActivity;
 import org.xbmc.lightremote.data.Movie;
 import org.xbmc.lightremote.data.PlayingProperties;
 import org.xbmc.lightremote.http.HttpTask;
@@ -17,8 +15,6 @@ import org.xbmc.lightremote.http.tasks.PlayerSeekTask;
 import org.xbmc.lightremote.http.tasks.PlayerSetVolumeTask;
 import org.xbmc.lightremote.http.tasks.PlayerStopTask;
 
-import android.util.Log;
-
 public class PlayerService implements IWebserviceTaskDelegate{
 
 	public static final int ACTION_OPEN = 1;
@@ -29,7 +25,6 @@ public class PlayerService implements IWebserviceTaskDelegate{
 	public static final int GET_PLAYING = 6;
 	public static final int GET_PROPERTIES = 7;
 	
-	private Movie mCurrentPlaying;
 	private int mPlayerId;
 	private IServiceDelegate mDelegate;
 

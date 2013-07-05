@@ -18,9 +18,9 @@ public class LibraryGetMoviesTask extends HttpTask {
 
 	public LibraryGetMoviesTask(IWebserviceTaskDelegate delegate, IDownloadTaskDelegate fileDelegate) {
 		super(delegate, 0);
-		
-//		run("http://192.168.1.22/jsonrpc", "{\"jsonrpc\": \"2.0\", \"method\": \"VideoLibrary.GetMovies\", \"params\": { \"filter\": {\"field\": \"playcount\", \"operator\": \"is\", \"value\": \"0\"}, \"limits\": { \"start\" : 0, \"end\": 75 }, \"properties\" : [\"art\", \"rating\", \"thumbnail\", \"playcount\", \"file\"], \"sort\": { \"order\": \"ascending\", \"method\": \"label\", \"ignorearticle\": true } }, \"id\": \"libMovies\"}");
-		run("http://192.168.1.22/jsonrpc", "{\"jsonrpc\": \"2.0\", \"method\": \"VideoLibrary.GetMovies\", \"id\": \"GetMovies\", \"params\": { \"properties\" : [\"art\", \"rating\", \"thumbnail\", \"playcount\", \"file\"], \"sort\": { \"order\": \"ascending\", \"method\": \"label\", \"ignorearticle\": true } }}");
+
+		String params = "{ \"properties\" : [\"art\", \"rating\", \"thumbnail\", \"playcount\", \"file\"], \"sort\": { \"order\": \"ascending\", \"method\": \"label\", \"ignorearticle\": true } }";
+		run("VideoLibrary.GetMovies", "GetMovies", params);
 	}
 	
 	@Override
@@ -32,8 +32,7 @@ public class LibraryGetMoviesTask extends HttpTask {
 		    String cacheDir = App.getAppContext().getFilesDir().getAbsolutePath();
 			
 			try {
-				JSONObject response = new JSONObject(mJson);
-				JSONObject result = response.getJSONObject("result");
+				JSONObject result = mJson.getJSONObject("result");
 				JSONArray movies = result.getJSONArray("movies");
 				for (int i = 0; i < movies.length(); i++) {
 					JSONObject data = movies.getJSONObject(i);

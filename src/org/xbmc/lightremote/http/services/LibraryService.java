@@ -1,13 +1,9 @@
 package org.xbmc.lightremote.http.services;
 
 import java.io.File;
-import org.xbmc.lightremote.App;
 import org.xbmc.lightremote.http.FileDownloadTask;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IDownloadTaskDelegate;
-import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
-
-import android.util.Log;
 
 public class LibraryService {
 

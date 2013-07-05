@@ -14,6 +14,7 @@ import org.xbmc.lightremote.http.tasks.LibraryGetMoviesTask;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -44,7 +45,8 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		setContentView(R.layout.activity_main);
 
 		
-		
+		ActionBar bar = getActionBar();
+		bar.setDisplayHomeAsUpEnabled(true);
 		
 		
 		SlidingMenu menu = getSlidingMenu();
@@ -56,7 +58,7 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
         //menu.setFadeDegree(0.35f);
         //menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         //menu.setMenu(R.layout.menu);
-        menu.setBehindOffset(50);
+        menu.setBehindOffset(150);
         //menu.setAboveOffset(100);
         //menu.setBehindWidth(500);
         menu.setShadowWidth(30);
@@ -99,11 +101,14 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
 	    switch (item.getItemId()) {
+	    	case android.R.id.home:
+	    		getSlidingMenu().showMenu();
+	    		return true;
 	        case R.id.menu_settings:
 	        	Intent intent = new Intent(this, SettingsActivity.class);
 	        	startActivity(intent);
