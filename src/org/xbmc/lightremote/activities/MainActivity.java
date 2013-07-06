@@ -1,8 +1,16 @@
 package org.xbmc.lightremote.activities;
 
+import java.io.File;
+
 import org.xbmc.lightremote.R;
+import org.xbmc.lightremote.data.Movie;
+import org.xbmc.lightremote.data.PlayingProperties;
 import org.xbmc.lightremote.fragments.LibraryMoviesFragment;
 import org.xbmc.lightremote.fragments.PlayingFragment;
+import org.xbmc.lightremote.http.IServiceDelegate;
+import org.xbmc.lightremote.http.services.PlayerService;
+
+import com.androidquery.AQuery;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -21,18 +29,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-public class MainActivity extends SlidingFragmentActivity implements OnClickListener {
+public class MainActivity extends SlidingFragmentActivity implements OnClickListener, IServiceDelegate {
 
-	SectionsPagerAdapter mSectionsPagerAdapter;
-	ViewPager mViewPager;
+	private SectionsPagerAdapter	mSectionsPagerAdapter;
+	private ViewPager 				mViewPager;
+	private PlayerService 			mService;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+    	mService = new PlayerService(this);
+		
 		// Configure ActionBar
 		ActionBar bar = getActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
@@ -44,7 +56,7 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
         menu.setShadowWidth(30);
 		menu.setBehindScrollScale(0.25f);
 		setBehindContentView(R.layout.menu);
-		findViewById(R.id.bt_playing).setOnClickListener(this);
+		findViewById(R.id.view_playing).setOnClickListener(this);
 		findViewById(R.id.bt_library_movies).setOnClickListener(this);
 		findViewById(R.id.bt_library_series).setOnClickListener(this);
 
@@ -55,6 +67,13 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		ft.commit();
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		mService.getPlaying();
+		mService.getProperties();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -83,7 +102,7 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		FragmentTransaction ft = fragmentManager.beginTransaction();
 		
 		switch(v.getId()) {
-		case R.id.bt_playing:
+		case R.id.view_playing:
 			ft.replace(R.id.layout_main, new PlayingFragment());
 //			intent = new Intent(this, PlayingActivity.class);
 			break;
@@ -173,6 +192,40 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 			textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
 			return textView;
 		}
+	}
+
+	@Override
+	public void onActionError(int action, String message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onActionCompleted(int action) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onGetPlaying(Movie movie) {
+		View view = getSlidingMenu().getMenu();
+		
+		if (movie != null) {
+			((TextView)view.findViewById(R.id.lb_playing_name)).setText(movie.label);
+			if (movie.thumbnailPath != null && new File(movie.thumbnailPath).exists()) {
+				ImageView img = (ImageView)view.findViewById(R.id.img_playing);
+		        AQuery aq = new AQuery(view);
+		        aq.id(img).image(movie.thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
+			}
+		} else {
+			view.findViewById(R.id.view_playing).setVisibility(View.GONE);
+		}
+	}
+
+	@Override
+	public void onGetProperties(PlayingProperties data) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

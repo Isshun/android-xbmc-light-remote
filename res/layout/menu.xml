@@ -2,15 +2,87 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_area"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:background="#222"
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
-    <Button
-        android:id="@+id/bt_playing"
-        android:layout_width="wrap_content"
+    <GridLayout
+        android:id="@+id/view_playing"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="5dp"
+        android:columnCount="3"
+        android:rowCount="4" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnSpan="3"
+            android:layout_gravity="left"
+            android:layout_row="0"
+            android:layout_rowSpan="1"
+            android:background="#555"
+            android:paddingBottom="3dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="3dp"
+            android:text="Current playing"
+            android:textColor="#eee" />
+
+        <ImageView
+            android:id="@+id/img_playing"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
+            android:layout_column="1"
+            android:layout_columnSpan="1"
+            android:layout_row="1"
+            android:layout_rowSpan="2"
+            android:src="@drawable/abs__btn_cab_done_focused_holo_light" />
+
+        <TextView
+            android:id="@+id/lb_playing_name"
+            android:layout_column="2"
+            android:layout_columnSpan="1"
+            android:layout_gravity="left"
+            android:layout_row="1"
+            android:layout_rowSpan="1"
+            android:text="NAME"
+            android:textColor="#eee"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/lb_playing_duration"
+            android:layout_column="2"
+            android:layout_columnSpan="1"
+            android:layout_gravity="left"
+            android:layout_row="2"
+            android:layout_rowSpan="1"
+            android:text="DURATION"
+            android:textColor="#eee" />
+
+        <View
+            android:id="@+id/view_playing_active"
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:layout_column="0"
+            android:layout_columnSpan="1"
+            android:layout_row="0"
+            android:layout_rowSpan="3"
+            android:background="#55bbff" />
+
+        <Space
+            android:layout_width="100dp"
+            android:layout_height="292dp"
+            android:layout_row="3" />
+    </GridLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_playing"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Playing" />
+        android:orientation="vertical" >
+    </LinearLayout>
 
     <Button
         android:id="@+id/bt_library_movies"
