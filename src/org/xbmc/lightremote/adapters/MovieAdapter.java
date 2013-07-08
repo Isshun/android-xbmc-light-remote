@@ -3,21 +3,17 @@ package org.xbmc.lightremote.adapters;
 import java.io.File;
 import java.util.List;
 
-import org.xbmc.lightremote.App;
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.data.Movie;
 
 import com.androidquery.AQuery;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MovieAdapter extends BaseAdapter {
@@ -29,6 +25,7 @@ public class MovieAdapter extends BaseAdapter {
 
 	private Context 		mContext;
 	private List<Movie> 	mMovies;
+	private int mLayout;
 
 	public MovieAdapter(Context context) {
 		mContext = context;
@@ -52,14 +49,14 @@ public class MovieAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View view, ViewGroup parent) {
-		LayoutInflater inflater = LayoutInflater.from(mContext);
-
-		Movie m = mMovies.get(position);
+		if (mLayout == 0) throw new IllegalArgumentException("setLayout must be call before view rendering");
 		
+		Movie m = mMovies.get(position);
+
         ViewHolder holder;
         
         if (view == null) {                                        
-    		view = inflater.inflate(R.layout.list_item_movie, parent, false);
+    		view = LayoutInflater.from(mContext).inflate(mLayout, parent, false);
             holder = new ViewHolder();
             holder.imgThumb = (ImageView) view.findViewById(R.id.imgThumb);
             holder.lbName = (TextView) view.findViewById(R.id.lb_name);
@@ -68,12 +65,13 @@ public class MovieAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 		
-		if (m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
+		if (holder.imgThumb != null && m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
 	        AQuery aq = new AQuery(view);
 	        aq.id(holder.imgThumb).image(m.thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
 		}
 
-		holder.lbName.setText(m.label);
+		if (holder.lbName != null)
+			holder.lbName.setText(m.label);
 
 		return view;
 	}
@@ -81,5 +79,9 @@ public class MovieAdapter extends BaseAdapter {
 	public void setData(List<Movie> data) {
 		mMovies = data;
 		notifyDataSetChanged();
+	}
+
+	public void setLayout(int layout) {
+		mLayout = layout;
 	}
 }

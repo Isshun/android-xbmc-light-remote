@@ -52,7 +52,7 @@ public class Movie implements Parcelable  {
 		// Streamdetails
 		if (obj.has("streamdetails")) {
 			JSONObject streamdetails = obj.getJSONObject("streamdetails");
-			if (streamdetails.has("video")) {
+			if (streamdetails.has("video") && streamdetails.getJSONArray("video").length() > 0) {
 				JSONObject video = streamdetails.getJSONArray("video").getJSONObject(0);
 
 				// Duration

@@ -1,19 +1,11 @@
 package org.xbmc.lightremote;
 
-import java.util.UUID;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import org.xbmc.lightremote.data.Movie;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Application;
 import android.content.Context;
-import android.graphics.Point;
-import android.os.Build;
-import android.text.style.SuperscriptSpan;
-import android.util.Log;
-import android.util.Patterns;
-import android.view.Display;
-import android.view.WindowManager;
 
 public class App extends Application {
 
@@ -25,9 +17,13 @@ public class App extends Application {
 
 	private static Context context;
 
+	public static List<Movie> movies;
+
     public void onCreate() {
         super.onCreate();
 
+        movies = new ArrayList<Movie>();
+        
     	App.context = getApplicationContext();
     }
 	

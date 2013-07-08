@@ -89,13 +89,20 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
         
         // Get status code
     	mStatusCode = response.getStatusLine().getStatusCode();
+    	if (mStatusCode != 200) {
+			mErrorMessage = response.getStatusLine().getReasonPhrase();
+			return false;
+    	}
+    	
     	Log.i(App.APP_NAME, String.format("code: %d", mStatusCode));
 
     	// Get content

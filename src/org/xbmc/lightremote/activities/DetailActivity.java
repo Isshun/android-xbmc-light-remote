@@ -2,7 +2,6 @@ package org.xbmc.lightremote.activities;
 
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.data.Movie;
-import org.xbmc.lightremote.data.PlayingProperties;
 import org.xbmc.lightremote.http.IServiceDelegate;
 import org.xbmc.lightremote.http.services.PlayerService;
 import android.app.Activity;
@@ -40,23 +39,11 @@ public class DetailActivity extends Activity implements OnClickListener, IServic
 	public void onClick(View v) {
 		switch(v.getId()) {
 		case R.id.bt_play:
-			mService.open(mMovie.file);
+			mService.reqOpen(mMovie.file);
 			setResult(1);
 			finish();
 			break;
 		}
-	}
-
-	@Override
-	public void onGetPlaying(Movie movie) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onGetProperties(PlayingProperties data) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -67,6 +54,12 @@ public class DetailActivity extends Activity implements OnClickListener, IServic
 
 	@Override
 	public void onActionCompleted(int action) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onActionStart(int action) {
 		// TODO Auto-generated method stub
 		
 	}

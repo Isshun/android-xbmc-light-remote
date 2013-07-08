@@ -14,11 +14,13 @@ import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 
 public class LibraryGetMoviesTask extends HttpTask {
 
-	private List<Movie> mList;
+	//private List<Movie> mList;
 
 	public LibraryGetMoviesTask(IWebserviceTaskDelegate delegate, IDownloadTaskDelegate fileDelegate) {
 		super(delegate, 0);
-
+	}
+	
+	public void run() {
 		String params = "{ \"properties\" : [\"art\", \"rating\", \"thumbnail\", \"playcount\", \"file\"], \"sort\": { \"order\": \"ascending\", \"method\": \"label\", \"ignorearticle\": true } }";
 		run("VideoLibrary.GetMovies", "GetMovies", params);
 	}
@@ -27,7 +29,9 @@ public class LibraryGetMoviesTask extends HttpTask {
 	protected Boolean doInBackground(String... params) {
 		if (super.doInBackground(params)) {
 
-			mList = new ArrayList<Movie>();
+			App.movies = new ArrayList<Movie>();
+			
+			//mList = new ArrayList<Movie>();
 			
 		    String cacheDir = App.getAppContext().getFilesDir().getAbsolutePath();
 			
@@ -46,7 +50,8 @@ public class LibraryGetMoviesTask extends HttpTask {
 						m.thumbnailPath = String.format("%s/%s.jpg", cacheDir, filename);
 					}
 					
-					mList.add(m);
+					App.movies.add(m);
+					//mList.add(m);
 				}
 				
 			} catch (JSONException e) {
@@ -61,7 +66,7 @@ public class LibraryGetMoviesTask extends HttpTask {
 	@Override
 	protected void onTaskCompleted(Boolean result, String errorMessage, int statusCode) {
 		if (result) {
-			mDelegate.onTaskCompleted(this, mList);
+			mDelegate.onTaskCompleted(this, App.movies);
 		} else {
 			mDelegate.onTaskError(this, errorMessage, statusCode);
 		}
