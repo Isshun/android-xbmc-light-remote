@@ -1,10 +1,12 @@
-package org.xbmc.lightremote.fragments;
+package org.xbmc.lightremote.fragment;
 
+import org.xbmc.lightremote.MediaActivity;
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.activities.DetailActivity;
 import org.xbmc.lightremote.adapters.MovieAdapter;
-import org.xbmc.lightremote.http.IServiceDelegate;
-import org.xbmc.lightremote.http.services.PlayerService;
+import org.xbmc.lightremote.http.IServiceListener;
+import org.xbmc.lightremote.service.PlayerService;
+
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,7 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.support.v4.app.NotificationCompat.Builder;
 
-public class LibraryMoviesFragment extends Fragment implements IServiceDelegate, OnItemClickListener, OnClickListener {
+public class LibraryMoviesFragment extends Fragment implements IServiceListener, OnItemClickListener, OnClickListener {
     private NotificationManager	mNotifyManager;
 	private Builder 			mBuilder;
 
@@ -42,13 +44,14 @@ public class LibraryMoviesFragment extends Fragment implements IServiceDelegate,
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
     	// Inflate the layout for this fragment
-    	View v = inflater.inflate(R.layout.fragment_library, container, false); 
+    	View v = inflater.inflate(R.layout.fragment_library_collection, container, false); 
 
 		mMovieAdapter = new MovieAdapter(getActivity());
 		//mMovieAdapter.setLayout(R.layout.list_item_movie);
 		mMovieAdapter.setLayout(R.layout.grid_item_movie);
 
-		mService = new PlayerService(this);
+		mService = PlayerService.getInstance();
+		mService.setListener(this);
 		
 		mLbError = (TextView)v.findViewById(R.id.lb_error);
 		mLayoutError = (View)v.findViewById(R.id.layout_error);
@@ -146,7 +149,7 @@ public class LibraryMoviesFragment extends Fragment implements IServiceDelegate,
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
 		//mService.open(adapter.getItem(pos).file);
-		Intent intent = new Intent(getActivity(), DetailActivity.class);
+		Intent intent = new Intent(getActivity(), MediaActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		intent.putExtra("movie", mMovieAdapter.getItem(pos));
 		startActivityForResult(intent, 1);

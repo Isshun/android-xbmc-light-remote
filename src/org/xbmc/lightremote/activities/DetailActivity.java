@@ -1,26 +1,28 @@
 package org.xbmc.lightremote.activities;
 
 import org.xbmc.lightremote.R;
-import org.xbmc.lightremote.data.Movie;
-import org.xbmc.lightremote.http.IServiceDelegate;
-import org.xbmc.lightremote.http.services.PlayerService;
+import org.xbmc.lightremote.data.MovieModel;
+import org.xbmc.lightremote.http.IServiceListener;
+import org.xbmc.lightremote.service.PlayerService;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
-public class DetailActivity extends Activity implements OnClickListener, IServiceDelegate {
+public class DetailActivity extends Activity implements OnClickListener, IServiceListener {
 
 	private PlayerService 	mService;
-	private Movie 			mMovie;
+	private MovieModel 			mMovie;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detail);
 
-		mService = new PlayerService(this);
+		mService = PlayerService.getInstance();
+		mService.setListener(this);
 		
 		Bundle bundle = getIntent().getExtras();
 		mMovie = bundle.getParcelable("movie");

@@ -1,24 +1,23 @@
-package org.xbmc.lightremote.fragments;
+package org.xbmc.lightremote.fragment;
 
 import java.util.List;
 
-import org.xbmc.lightremote.App;
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.R.id;
 import org.xbmc.lightremote.R.layout;
 import org.xbmc.lightremote.activities.DetailActivity;
 import org.xbmc.lightremote.adapters.MovieAdapter;
-import org.xbmc.lightremote.data.Movie;
+import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.data.PlayingProperties;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IDownloadTaskDelegate;
-import org.xbmc.lightremote.http.IServiceDelegate;
+import org.xbmc.lightremote.http.IServiceListener;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 import org.xbmc.lightremote.http.TestDelegate;
-import org.xbmc.lightremote.http.services.LibraryService;
-import org.xbmc.lightremote.http.services.PlayerService;
 import org.xbmc.lightremote.http.tasks.PlayerOpenTask;
 import org.xbmc.lightremote.http.tasks.LibraryGetMoviesTask;
+import org.xbmc.lightremote.service.LibraryService;
+import org.xbmc.lightremote.service.PlayerService;
 
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -36,7 +35,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.support.v4.app.NotificationCompat.Builder;
 
-public class LibrarySeriesFragment extends Fragment implements IServiceDelegate {
+public class LibrarySeriesFragment extends Fragment implements IServiceListener {
     private NotificationManager mNotifyManager;
 	private Builder mBuilder;
 	private int mMoviesCount;

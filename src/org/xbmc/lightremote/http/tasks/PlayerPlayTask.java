@@ -3,10 +3,10 @@ package org.xbmc.lightremote.http.tasks;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 
-public class PlayerPlayTask extends HttpTask {
+public class PlayerPlayTask extends HttpTask<Boolean> {
 
-	public PlayerPlayTask(IWebserviceTaskDelegate delegate, int mPlayerId) {
-		super(delegate, 0);
+	public PlayerPlayTask(int mPlayerId) {
+		super(0);
 		String params = String.format("{ \"playerid\": %d }", mPlayerId);
 		run("Player.PlayPause", "PlayPause", params);
 	}
@@ -19,12 +19,4 @@ public class PlayerPlayTask extends HttpTask {
 		return false;
 	}
 	
-	@Override
-	protected void onTaskCompleted(Boolean result, String errorMessage, int statusCode) {
-		if (result) {
-			mDelegate.onTaskCompleted(this, null);
-		} else {
-			mDelegate.onTaskError(this, errorMessage, statusCode);
-		}
-	}
 }

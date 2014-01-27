@@ -1,9 +1,9 @@
-package org.xbmc.lightremote.fragments;
+package org.xbmc.lightremote.fragment;
 
-import org.xbmc.lightremote.App;
+import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.R;
-import org.xbmc.lightremote.http.IServiceDelegate;
-import org.xbmc.lightremote.http.services.PlayerService;
+import org.xbmc.lightremote.http.IServiceListener;
+import org.xbmc.lightremote.service.PlayerService;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +18,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.webkit.WebView.FindListener;
 
-public class PlayingGestureFragment extends Fragment implements OnClickListener, IServiceDelegate, OnGestureListener, OnTouchListener {
+public class PlayingGestureFragment extends Fragment implements OnClickListener, IServiceListener, OnGestureListener, OnTouchListener {
 	
 	private PlayerService mService;
 	private View mView;
@@ -34,7 +34,8 @@ public class PlayingGestureFragment extends Fragment implements OnClickListener,
 
     	mDetector = new GestureDetector(getActivity(), this);
 
-    	mService = new PlayerService(this);
+    	mService = PlayerService.getInstance();
+		mService.setListener(this);
 
         return mView; 
     }
@@ -85,7 +86,7 @@ public class PlayingGestureFragment extends Fragment implements OnClickListener,
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 
-		Log.w(App.APP_NAME, String.format("%f x %f", distanceX, distanceY));
+		Log.w(Application.APP_NAME, String.format("%f x %f", distanceX, distanceY));
 		
 		return false;
 	}
@@ -104,7 +105,7 @@ public class PlayingGestureFragment extends Fragment implements OnClickListener,
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		Log.w(App.APP_NAME, "TOUCH");
+		Log.w(Application.APP_NAME, "TOUCH");
 		
         return mDetector.onTouchEvent(event);
 	}

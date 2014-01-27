@@ -1,14 +1,17 @@
 package org.xbmc.lightremote.adapters;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
+import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.R;
-import org.xbmc.lightremote.data.Movie;
-
-import com.androidquery.AQuery;
+import org.xbmc.lightremote.data.MovieModel;
+import org.xbmc.lightremote.service.ImageService;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +27,7 @@ public class MovieAdapter extends BaseAdapter {
 	}
 
 	private Context 		mContext;
-	private List<Movie> 	mMovies;
+	private List<MovieModel> 	mMovies;
 	private int mLayout;
 
 	public MovieAdapter(Context context) {
@@ -38,7 +41,7 @@ public class MovieAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Movie getItem(int position) {
+	public MovieModel getItem(int position) {
 		return mMovies != null ? mMovies.get(position) : null;
 	}
 
@@ -51,7 +54,7 @@ public class MovieAdapter extends BaseAdapter {
 	public View getView(int position, View view, ViewGroup parent) {
 		if (mLayout == 0) throw new IllegalArgumentException("setLayout must be call before view rendering");
 		
-		Movie m = mMovies.get(position);
+		MovieModel m = mMovies.get(position);
 
         ViewHolder holder;
         
@@ -65,10 +68,19 @@ public class MovieAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 		
-		if (holder.imgThumb != null && m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
-	        AQuery aq = new AQuery(view);
-	        aq.id(holder.imgThumb).image(m.thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
+		ImageService.getInstance().showThumb(holder.imgThumb, m.thumbnailPath);
+        
+//		if (holder.imgThumb != null && m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
+		String url = m.thumbnail.replace("image://", "");
+		try {
+			url = URLDecoder.decode(url, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
+
+		ImageService.getInstance().showThumb(holder.imgThumb, url);
+		Log.e(Application.APP_NAME, url);
+//		}
 
 		if (holder.lbName != null)
 			holder.lbName.setText(m.label);
@@ -76,7 +88,7 @@ public class MovieAdapter extends BaseAdapter {
 		return view;
 	}
 
-	public void setData(List<Movie> data) {
+	public void setData(List<MovieModel> data) {
 		mMovies = data;
 		notifyDataSetChanged();
 	}

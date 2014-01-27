@@ -1,50 +1,41 @@
 package org.xbmc.lightremote.http.tasks;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.xbmc.lightremote.data.PlayingProperties;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 import org.xbmc.lightremote.http.IPlayerTask;
+import org.xbmc.lightremote.http.HttpTask.HttpTaskStrategy;
 
-public class PlayerGetPropertiesTask extends HttpTask implements IPlayerTask {
+public class PlayerGetPropertiesTask extends HttpTask<PlayingProperties> implements IPlayerTask {
 
 	private PlayingProperties mProperties;
 	
-	public PlayerGetPropertiesTask(IWebserviceTaskDelegate delegate) {
-		super(delegate, 0);
+	public PlayerGetPropertiesTask() {
+		super(0);
+		
+		mStrategy = new HttpTaskStrategy<PlayingProperties>() {
+			@Override
+			public PlayingProperties execute(JSONObject obj) {
+				try {
+					return PlayingProperties.Create(mJson.getJSONObject("result"));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
 	}
 	
 	public void run(int playerId) {
 		if (playerId == 0) {
-			mDelegate.onTaskCompleted(this, null);
-			return;
-		}
-
-		String params = String.format("{ \"properties\": [\"percentage\", \"totaltime\", \"time\", \"position\"], \"playerid\": %d }", playerId);
-		run("Player.GetProperties", "GetProperties", params);
-	}
-	
-	@Override
-	protected Boolean doInBackground(String... params) {
-		if (super.doInBackground(params)) {
-			
-			try {
-				mProperties = PlayingProperties.Create(mJson.getJSONObject("result"));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	protected void onTaskCompleted(Boolean result, String errorMessage, int statusCode) {
-		if (result) {
-			mDelegate.onTaskCompleted(this, mProperties);
+			onPostExecute(null);
 		} else {
-			mDelegate.onTaskError(this, errorMessage, statusCode);
+			String params = String.format("{ \"properties\": [\"percentage\", \"totaltime\", \"time\", \"position\"], \"playerid\": %d }", playerId);
+			run("Player.GetProperties", "GetProperties", params);
 		}
 	}
+	
 }

@@ -3,12 +3,12 @@ package org.xbmc.lightremote.http.tasks;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 
-public class PlayerOpenTask extends HttpTask {
+public class PlayerOpenTask extends HttpTask<Boolean> {
 
 	String mPath;
 	
-	public PlayerOpenTask(IWebserviceTaskDelegate delegate, String path) {
-		super(delegate, 0);
+	public PlayerOpenTask(String path) {
+		super(0);
 		
 		mPath = path;
 
@@ -24,14 +24,4 @@ public class PlayerOpenTask extends HttpTask {
 		return false;
 	}
 	
-	@Override
-	protected void onTaskCompleted(Boolean result, String errorMessage, int statusCode) {
-		if (mDelegate == null) return;
-		
-		if (result) {
-			mDelegate.onTaskCompleted(this, null);
-		} else {
-			mDelegate.onTaskError(this, errorMessage, statusCode);
-		}
-	}
 }

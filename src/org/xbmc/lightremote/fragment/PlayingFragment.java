@@ -1,15 +1,16 @@
-package org.xbmc.lightremote.fragments;
+package org.xbmc.lightremote.fragment;
 
 import java.io.File;
+import java.util.List;
 
-import org.xbmc.lightremote.App;
+import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.R;
-import org.xbmc.lightremote.data.Movie;
+import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.data.PlayingProperties;
-import org.xbmc.lightremote.http.IServiceDelegate;
-import org.xbmc.lightremote.http.services.PlayerService;
-
-import com.androidquery.AQuery;
+import org.xbmc.lightremote.http.IServiceListener;
+import org.xbmc.lightremote.service.ImageService;
+import org.xbmc.lightremote.service.PlayerService;
+import org.xbmc.lightremote.service.ServiceManager;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,7 +23,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-public class PlayingFragment extends Fragment implements OnClickListener, IServiceDelegate {
+public class PlayingFragment extends Fragment implements OnClickListener, IServiceListener {
 	
 	private PlayerService mService;
 	private View mView;
@@ -37,7 +38,8 @@ public class PlayingFragment extends Fragment implements OnClickListener, IServi
     	mView.findViewById(R.id.bt_stop).setOnClickListener(this);
     	mView.findViewById(R.id.bt_refresh).setOnClickListener(this);
     	
-    	mService = new PlayerService(this);
+    	mService = PlayerService.getInstance();
+		mService.setListener(this);
 
         return mView; 
     }
@@ -79,7 +81,7 @@ public class PlayingFragment extends Fragment implements OnClickListener, IServi
 			mView.findViewById(R.id.layout_area).setVisibility(View.GONE);
 			break;
 		case PlayerService.GET_PLAYING:
-			Movie movie = mService.getPlaying();
+			final MovieModel movie = mService.getPlaying();
 			
 			if (movie != null) {
 				mView.findViewById(R.id.layout_no_playing).setVisibility(View.GONE);
@@ -94,19 +96,23 @@ public class PlayingFragment extends Fragment implements OnClickListener, IServi
 
 				// Thumbnail path 
 				String thumbnailPath = movie.thumbnailPath; 
-				if (movie.thumbnailPath == null) {
-					for (Movie m: App.movies) {
-						if (m.movieId == movie.movieId && m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
-							thumbnailPath = m.thumbnailPath;
-//					        AQuery aq = new AQuery(view);
-//					        aq.id(R.id.img_playing).image(m.thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
-						}
-					}
-				}
+//				if (movie.thumbnailPath == null) {
+//					ServiceManager.getLibraryService().getMovies(new OnGetMoviesListener() {
+//						@Override
+//						public void onGetMovies(List<MovieModel> movies) {
+//							for (MovieModel m: movies) {
+//								if (m.movieId == movie.movieId && m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
+//									thumbnailPath = m.thumbnailPath;
+////							        AQuery aq = new AQuery(view);
+////							        aq.id(R.id.img_playing).image(m.thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
+//								}
+//							}
+//						}
+//					});
+//				}
 				if (thumbnailPath != null && new File(thumbnailPath).exists()) {
 					ImageView img = (ImageView)mView.findViewById(R.id.img_playing);
-			        AQuery aq = new AQuery(mView);
-			        aq.id(img).image(thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
+					ImageService.getInstance().showThumb(img, thumbnailPath);
 				}
 				
 				// Seek bar

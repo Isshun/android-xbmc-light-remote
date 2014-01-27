@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Movie implements Parcelable  {
+public class MovieModel implements Parcelable  {
 	
 	public String file;
 	public String label;
@@ -17,8 +17,8 @@ public class Movie implements Parcelable  {
 	public double rating;
 	public String thumbnail;
 
-	public static Movie Create(JSONObject obj) throws JSONException {
-		Movie m = new Movie();
+	public static MovieModel Create(JSONObject obj) throws JSONException {
+		MovieModel m = new MovieModel();
 		
 		// Label
 		if (obj.has("title"))
@@ -64,10 +64,10 @@ public class Movie implements Parcelable  {
 		return m;
 	}
 
-	public Movie() {
+	public MovieModel() {
 	}
 	
-	public Movie(Parcel in) {
+	public MovieModel(Parcel in) {
 		this.file= in.readString();
 		this.label = in.readString();
 		this.thumbnailPath = in.readString();
@@ -94,18 +94,18 @@ public class Movie implements Parcelable  {
 		return 0;
 	}
 
-	public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>()
+	public static final Parcelable.Creator<MovieModel> CREATOR = new Parcelable.Creator<MovieModel>()
 	{
 		@Override
-		public Movie createFromParcel(Parcel source)
+		public MovieModel createFromParcel(Parcel source)
 		{
-			return new Movie(source);
+			return new MovieModel(source);
 		}
 
 		@Override
-		public Movie[] newArray(int size)
+		public MovieModel[] newArray(int size)
 		{
-			return new Movie[size];
+			return new MovieModel[size];
 		}
 	};
 }

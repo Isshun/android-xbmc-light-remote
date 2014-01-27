@@ -5,10 +5,10 @@ import java.util.Locale;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 
-public class PlayerSeekTask extends HttpTask {
+public class PlayerSeekTask extends HttpTask<Boolean> {
 
-	public PlayerSeekTask(IWebserviceTaskDelegate delegate, int mPlayerId, double percent) {
-		super(delegate, 0);
+	public PlayerSeekTask(int mPlayerId, double percent) {
+		super(0);
 		String params = String.format(Locale.ENGLISH, "{ \"playerid\": %d, \"value\": %f }", mPlayerId, percent);
 		run("Player.Seek", "Seek", params);
 	}
@@ -21,12 +21,4 @@ public class PlayerSeekTask extends HttpTask {
 		return false;
 	}
 	
-	@Override
-	protected void onTaskCompleted(Boolean result, String errorMessage, int statusCode) {
-		if (result) {
-			mDelegate.onTaskCompleted(this, null);
-		} else {
-			mDelegate.onTaskError(this, errorMessage, statusCode);
-		}
-	}
 }

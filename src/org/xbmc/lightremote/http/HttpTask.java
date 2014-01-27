@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -18,29 +19,40 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xbmc.lightremote.App;
+import org.xbmc.lightremote.Application;
 
-public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
+public abstract class HttpTask<TResult> extends AsyncTask<String, Integer, TResult> {
 	
 	private DefaultHttpClient			mHttpClient;
 	private String 						mErrorMessage;
 	private int 						mId;
 	private boolean 					mComplete;
-	protected IWebserviceTaskDelegate 	mDelegate;
 	protected JSONObject 				mJson;
 	private int 						mStatusCode;
 	
-	public HttpTask(IWebserviceTaskDelegate delegate, int id) {
-		mDelegate = delegate;
+	protected HttpTaskStrategy<TResult>	mStrategy;
+	private ArrayList<HttpTaskListener> mListeners;
+	
+	public static interface HttpTaskStrategy<TResult> {
+		TResult execute(JSONObject obj);
+	}
+	
+	public static interface HttpTaskListener<TResult> {
+		void onSuccess(TResult result);
+		void onFailed(String message, int code);
+	}
+	
+	public HttpTask(int id) {
 		mId = id;
 		
 		//Log.i(App.APP_NAME, "new WebserviceTask");
 	}
 	
-	public IWebserviceTaskDelegate getDelegate() {
-		return mDelegate;
+	public void addListener(HttpTaskListener<TResult> listener) {
+		mListeners = new ArrayList<HttpTaskListener>();
+		mListeners.add(listener);
 	}
-
+	
 	/**
 	 * Android will invoke this method when this async task was started, or when user came back to our application.
 	 */
@@ -52,8 +64,8 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 	 * Will be invoked when calling execute(). Everything the task need to do, will be implement here
 	 */
 	// TODO: Use HttpURLConnection instead DefaultHttpClient
-	protected Boolean doInBackground(String... params) {
-		Log.d(App.APP_NAME, "New task: " + params[0]);
+	protected TResult doInBackground(String... params) {
+		Log.d(Application.APP_NAME, "New task: " + params[0]);
 		
 		String cmd = null;
 		if (params.length == 3 && params[2] != null) {
@@ -69,7 +81,8 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 
 		HttpPost httppost = new HttpPost("http://192.168.1.22/jsonrpc");
 		String name = "alex";
-		String password = App.getAppContext().getSharedPreferences(App.APP_NAME, 0).getString("password", null);
+//		String password = App.getAppContext().getSharedPreferences(App.APP_NAME, 0).getString("password", null);
+		String password = "Schrodinger";
 		String auth = "Basic " + Base64.encodeToString((name + ':' + password).getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
         httppost.setHeader("Authorization", auth);
     	DefaultHttpClient client = new DefaultHttpClient();
@@ -89,21 +102,21 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
+			return null;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
+			return null;
 		}
         
         // Get status code
     	mStatusCode = response.getStatusLine().getStatusCode();
     	if (mStatusCode != 200) {
 			mErrorMessage = response.getStatusLine().getReasonPhrase();
-			return false;
+			return null;
     	}
     	
-    	Log.i(App.APP_NAME, String.format("code: %d", mStatusCode));
+    	Log.i(Application.APP_NAME, String.format("code: %d", mStatusCode));
 
     	// Get content
 	    StringBuilder sb = new StringBuilder();
@@ -128,20 +141,24 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
 			// API error
 			if (mJson.has("error")) {
 				mErrorMessage = mJson.getJSONObject("error").getString("message");
-				return false;
+				return null;
 			}
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-        Log.v(App.APP_NAME, String.format("Response: %s", sb.toString()));
+        Log.v(Application.APP_NAME, String.format("Response: %s", sb.toString()));
         
-		return true;
+        if (mStrategy != null) {
+        	return mStrategy.execute(mJson);
+        }
+
+        return null;
 	}
 
-    protected void onCancelled(Boolean result) {
-    	Log.i(App.APP_NAME, "task canceled");
+    protected void onCancelled(TResult result) {
+    	Log.i(Application.APP_NAME, "task canceled");
     	
     	if (mHttpClient != null)
         	mHttpClient.getConnectionManager().shutdown();
@@ -152,25 +169,23 @@ public abstract class HttpTask extends AsyncTask<String, Integer, Boolean> {
     /**
      * After doInBackground has been completed, this method will be called, by UI thread
      */
-    protected void onPostExecute(Boolean result) {
-    	Log.i(App.APP_NAME, "task complete: " + result);
+    protected void onPostExecute(TResult result) {
+    	Log.i(Application.APP_NAME, "task complete: " + result);
 
     	mComplete = true;
-    	onTaskCompleted(result, mErrorMessage, mStatusCode);
+
+    	for (HttpTaskListener<TResult> listener: mListeners) {
+			if (result != null) {
+				listener.onSuccess(result);
+			} else {
+		    	listener.onFailed(mErrorMessage, mStatusCode);
+			}
+		}
     }
 
     public boolean isComplete() {
     	return mComplete;
     }
-    
-    /**
-     * Helper method to notify the activity that this task was completed.
-     */
-    protected abstract void onTaskCompleted(Boolean result, String errorMessage, int statusCode);
-
-//    public void run(String url) {
-//    	run(url, null);
-//    }
     
 	@TargetApi(11)
 	public void run(String methode, String id) {

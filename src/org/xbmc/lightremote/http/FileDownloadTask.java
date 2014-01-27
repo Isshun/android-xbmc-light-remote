@@ -22,7 +22,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.xbmc.lightremote.App;
+import org.xbmc.lightremote.Application;
 
 import android.content.Context;
 
@@ -51,7 +51,7 @@ import android.content.Context;
 		 */
 		protected Boolean doInBackground(String... params) {
 			
-			Log.i(App.APP_NAME, "DownloadTask: " + params[0]);
+			Log.i(Application.APP_NAME, "DownloadTask: " + params[0]);
 			
 			FileOutputStream out = null;
 
@@ -68,8 +68,8 @@ import android.content.Context;
 	 		    cn.setDoOutput(true);
 	 		   	
 			    cn.connect();
-			    cn.setConnectTimeout(App.CONNECT_TIMEOUT);
-			    cn.setReadTimeout(App.IMAGE_READ_TIMEOUT);
+			    cn.setConnectTimeout(Application.CONNECT_TIMEOUT);
+			    cn.setReadTimeout(Application.IMAGE_READ_TIMEOUT);
 			    InputStream stream = cn.getInputStream();
 
 			    File downloadingMediaFile = new File(tmpPath);

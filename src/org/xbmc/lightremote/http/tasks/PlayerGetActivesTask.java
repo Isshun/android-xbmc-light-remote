@@ -1,43 +1,38 @@
 package org.xbmc.lightremote.http.tasks;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.xbmc.lightremote.Application;
+import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
+import org.xbmc.lightremote.http.HttpTask.HttpTaskStrategy;
 
-public class PlayerGetActivesTask extends HttpTask {
+public class PlayerGetActivesTask extends HttpTask<Integer> {
 
-	private int mId;
-	
-	public PlayerGetActivesTask(IWebserviceTaskDelegate delegate) {
-		super(delegate, 0);
+	public PlayerGetActivesTask() {
+		super(0);
+
+		mStrategy = new HttpTaskStrategy<Integer>() {
+			@Override
+			public Integer execute(JSONObject obj) {
+				try {
+					JSONArray results = mJson.getJSONArray("result");
+					if (results.length() > 0) {
+						return results.getJSONObject(0).getInt("playerid");
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
 
 		run("Player.GetActivePlayers", "GetActivePlayers");
 	}
 	
-	@Override
-	protected Boolean doInBackground(String... params) {
-		if (super.doInBackground(params)) {
-			
-			try {
-				JSONArray results = mJson.getJSONArray("result");
-				if (results.length() > 0)
-					mId = results.getJSONObject(0).getInt("playerid");
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	protected void onTaskCompleted(Boolean result, String errorMessage, int statusCode) {
-		if (result) {
-			mDelegate.onTaskCompleted(this, mId);
-		} else {
-			mDelegate.onTaskError(this, errorMessage, statusCode);
-		}
-	}
 }

@@ -2,7 +2,7 @@ package org.xbmc.lightremote.activities;
 
 import java.util.List;
 
-import org.xbmc.lightremote.App;
+import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.R;
 
 import android.app.Activity;
@@ -32,7 +32,7 @@ public class SettingsActivity extends PreferenceActivity {
 	            setListFooter(button);
 	        }
 	        
-			mSharedPrefs = getSharedPreferences(App.APP_NAME, 0); 
+			mSharedPrefs = getSharedPreferences(Application.APP_NAME, 0); 
 	    }
 
 	    /**
@@ -65,7 +65,7 @@ public class SettingsActivity extends PreferenceActivity {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				if (preference.getKey().equals("password")) {
-		            App.getAppContext().getSharedPreferences(App.APP_NAME, 0).edit().putString("password", (String)newValue).commit();
+					Application.getContext().getSharedPreferences(Application.APP_NAME, 0).edit().putString("password", (String)newValue).commit();
 					return true;
 				}
 				return false;

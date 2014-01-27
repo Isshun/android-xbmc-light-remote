@@ -14,4 +14,21 @@
     <string name="player_pause">Pause</string>
     <string name="play">Play</string>
 
+    <!-- Name of app, shown when installing/uninstalling extension -->
+    <string name="app_name">Advanced Sample control</string>
+    <!-- Title of preference activity -->
+    <string name="preference_activity_title">Advanced Sample control</string>
+    <!-- Name of extension, shown in preferences -->
+    <string name="extension_name">Advanced Sample control</string>
+    <!-- Configuration title shown in preferences -->
+    <string name="configuration_text">Sample control settings</string>
+    <!-- Menu option shown in preferences -->
+    <string name="preference_option_read_me">READ ME</string>
+    <!-- Read me text shown in dialog -->
+    <string name="preference_option_read_me_txt">The Advanced Control Extension uses API v2 features to display scrollable lists and a swipeable gallery. The Extension overrides the Back button to navigate back to previous control extension screens.  </string>
+    <string name="title_activity_media">MediaActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+
 </resources>

@@ -2,21 +2,24 @@ package org.xbmc.lightremote.activities;
 
 import java.io.File;
 
-import org.xbmc.lightremote.App;
+import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.R;
-import org.xbmc.lightremote.data.Movie;
-import org.xbmc.lightremote.fragments.LibraryMoviesFragment;
-import org.xbmc.lightremote.fragments.PlayingFragment;
-import org.xbmc.lightremote.fragments.PlayingGestureFragment;
-import org.xbmc.lightremote.http.IServiceDelegate;
-import org.xbmc.lightremote.http.services.PlayerService;
+import org.xbmc.lightremote.data.MovieModel;
+import org.xbmc.lightremote.fragment.LibraryFilterFragment;
+import org.xbmc.lightremote.fragment.LibraryFilterFragment.OnCategoryChangeListener;
+import org.xbmc.lightremote.fragment.LibraryMoviesFragment;
+import org.xbmc.lightremote.fragment.PlayingFragment;
+import org.xbmc.lightremote.fragment.PlayingGestureFragment;
+import org.xbmc.lightremote.http.IServiceListener;
+import org.xbmc.lightremote.service.ImageService;
+import org.xbmc.lightremote.service.PlayerService;
 
-import com.androidquery.AQuery;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenListener;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,10 +34,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-public class MainActivity extends SlidingFragmentActivity implements OnClickListener, IServiceDelegate {
+public class MainActivity extends SlidingFragmentActivity implements OnClickListener, IServiceListener {
 
 	private PlayerService 			mService;
 	private Menu mMenu;
@@ -44,8 +49,9 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-    	mService = new PlayerService(this);
-		
+    	mService = PlayerService.getInstance();
+		mService.setListener(this);
+
 		// Configure ActionBar
 		ActionBar bar = getActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
@@ -59,7 +65,7 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		menu.setOnOpenListener(new OnOpenListener() {
 			@Override
 			public void onOpen() {
-				Log.d(App.APP_NAME, "Open menu");				
+				Log.d(Application.APP_NAME, "Open menu");				
 				mService.reqPlaying();
 				mService.reqProperties();
 			}
@@ -70,10 +76,43 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		findViewById(R.id.bt_library_series).setOnClickListener(this);
 
 		// Initialize first fragment
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		FragmentTransaction ft = fragmentManager.beginTransaction();
-		ft.replace(R.id.layout_main, new LibraryMoviesFragment());
+		final FragmentManager fragmentManager = getSupportFragmentManager();
+		final FragmentTransaction ft = fragmentManager.beginTransaction();
+		
+		LibraryFilterFragment fragment = new LibraryFilterFragment();
+		fragment.setOnCategoryChangeListener(new OnCategoryChangeListener() {
+
+			@Override
+			public void onCategoryChange(String category) {
+				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+				fragmentTransaction.replace(R.id.layout_main, new LibraryMoviesFragment());
+				fragmentTransaction.commit();
+			}
+			
+		});
+		ft.replace(R.id.layout_main, fragment);
 		ft.commit();
+		
+		// Adapter
+		SpinnerAdapter adapter = ArrayAdapter.createFromResource(this, R.array.actions, android.R.layout.simple_spinner_dropdown_item);
+
+		// Callback
+		OnNavigationListener callback = new OnNavigationListener() {
+		    String[] items = getResources().getStringArray(R.array.actions); // List items from res
+
+		    @Override
+		    public boolean onNavigationItemSelected(int position, long id) {
+		        Log.d("NavigationItemSelected", items[position]); // Debug
+		        return true;
+		    }
+
+		};
+
+		// Action Bar
+		ActionBar actions = getActionBar();
+		actions.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		actions.setDisplayShowTitleEnabled(false);
+		actions.setListNavigationCallbacks(adapter, callback);
 	}
 
 	@Override
@@ -226,27 +265,26 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		switch (action) {
 			case PlayerService.GET_PLAYING:
 				View view = getSlidingMenu().getMenu();
-				Movie movie = mService.getPlaying();
+				MovieModel movie = mService.getPlaying();
 				
 				if (movie != null) {
 					((TextView)view.findViewById(R.id.lb_playing_name)).setText(movie.label);
 
-					// Thumbnail path 
-					String thumbnailPath = movie.thumbnailPath; 
-					if (movie.thumbnailPath == null) {
-						for (Movie m: App.movies) {
-							if (m.movieId == movie.movieId && m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
-								thumbnailPath = m.thumbnailPath;
-//						        AQuery aq = new AQuery(view);
-//						        aq.id(R.id.img_playing).image(m.thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
-							}
-						}
-					}
-					if (thumbnailPath != null && new File(thumbnailPath).exists()) {
-						ImageView img = (ImageView)view.findViewById(R.id.img_playing);
-				        AQuery aq = new AQuery(view);
-				        aq.id(img).image(thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
-					}
+//					// Thumbnail path 
+//					String thumbnailPath = movie.thumbnailPath; 
+//					if (movie.thumbnailPath == null) {
+//						for (MovieModel m: Application.sMovies) {
+//							if (m.movieId == movie.movieId && m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
+//								thumbnailPath = m.thumbnailPath;
+////						        AQuery aq = new AQuery(view);
+////						        aq.id(R.id.img_playing).image(m.thumbnailPath, true, true, 120, 0, null, AQuery.FADE_IN);
+//							}
+//						}
+//					}
+//					if (thumbnailPath != null && new File(thumbnailPath).exists()) {
+//						ImageView img = (ImageView)view.findViewById(R.id.img_playing);
+//						ImageService.getInstance().showThumb(img, thumbnailPath);
+//					}
 	
 					view.findViewById(R.id.view_playing).setVisibility(View.VISIBLE);
 				} else {
