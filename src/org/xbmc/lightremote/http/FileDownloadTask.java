@@ -128,7 +128,7 @@ import android.content.Context;
 	    		// Move .tmp file to real location
 	    		String finalPath = mPath.substring(0, mPath.length() - 4);
 //	    		Log.e(App.APP_NAME, "move from: " + mPath);
-//	    		Log.e(App.APP_NAME, "move to: " + finalPath);
+	    		Log.e(Application.APP_NAME, "move to: " + finalPath);
 	    		(new File(mPath)).renameTo(new File(finalPath));
 
 	    		mDelegate.onTaskCompleted(null, finalPath);

@@ -1,5 +1,8 @@
 package org.xbmc.lightremote.adapters;
 
+import java.util.List;
+
+import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.R;
 
 import android.content.Context;
@@ -13,20 +16,24 @@ import android.widget.TextView;
 
 public class LibraryFilterAdapter extends ArrayAdapter<String> {
 
-	public static String mCategories[] = {"Comedy", "Thriller", "Sci-Fi", "Horror", "Romance", "Adventure", "Survival", "test", "test", "test", "test", "test", "test", "test", "test", "test", "test", "test", "test", "test", "test"};
-	
+	private List<String> mGenres;
+
 	public LibraryFilterAdapter(Context context, int resource) {
 		super(context, resource);
 	}
 
+	public void setGenres(List<String> genres) {
+		mGenres = genres;
+	}
+	
 	@Override
 	public int getCount() {
-		return mCategories.length;
+		return mGenres != null ? mGenres.size() : 0;
 	}
 
 	@Override
 	public String getItem(int position) {
-		return mCategories[position];
+		return mGenres.get(position);
 	}
 
 	@Override
@@ -41,7 +48,7 @@ public class LibraryFilterAdapter extends ArrayAdapter<String> {
 		}
 		
 		TextView lbCategory = (TextView)view.findViewById(R.id.lb_category);
-    	lbCategory.setText(getItem(position));
+    	lbCategory.setText(position == 0 ? Application.getResString(R.string.home_item_all_genres) : getItem(position));
 
 		return view;
 	}

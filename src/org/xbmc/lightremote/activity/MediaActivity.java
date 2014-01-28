@@ -47,6 +47,7 @@ public class MediaActivity extends FragmentActivity {
 		setContentView(R.layout.activity_media);
 		
 		final int position = getIntent().getExtras().getInt("position", 0);
+		final String genre = getIntent().getExtras().getString("genre");
 		
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setPersistentDrawingCache(ViewGroup.PERSISTENT_ALL_CACHES);
@@ -71,7 +72,7 @@ public class MediaActivity extends FragmentActivity {
 				// TODO Auto-generated method stub
 				
 			}
-		});
+		}, genre);
 	}
 
 	@Override

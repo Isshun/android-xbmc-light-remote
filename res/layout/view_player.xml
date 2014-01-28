@@ -1,28 +1,42 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<org.xbmc.lightremote.view.PlayerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="36dp"
-    android:background="@drawable/bg_player"
-    android:orientation="horizontal"
-    android:paddingBottom="5dp"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp"
-    android:paddingTop="8dp" >
+    android:background="@drawable/bg_player" >
 
-    <TextView
-        android:id="@+id/lb_player_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="left|center_vertical"
-        android:textSize="18sp" />
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="8dp" >
 
-    <ImageView
-        android:id="@+id/bt_player"
-        android:layout_width="50dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="0"
-        android:src="@drawable/ic_launcher" />
+        <TextView
+            android:id="@+id/player_lb_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical"
+            android:textSize="18sp" />
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/player_bt"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0"
+            android:src="@drawable/ic_launcher" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/player_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
+
+</org.xbmc.lightremote.view.PlayerView>

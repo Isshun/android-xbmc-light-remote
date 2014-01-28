@@ -2,6 +2,7 @@ package org.xbmc.lightremote.service;
 
 import java.util.List;
 
+import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.data.PlayingProperties;
 import org.xbmc.lightremote.http.HttpTask;
@@ -18,7 +19,10 @@ import org.xbmc.lightremote.http.tasks.PlayerOpenTask;
 import org.xbmc.lightremote.http.tasks.PlayerPlayTask;
 import org.xbmc.lightremote.http.tasks.PlayerSeekTask;
 import org.xbmc.lightremote.http.tasks.PlayerSetVolumeTask;
+import org.xbmc.lightremote.http.tasks.PlayerSetVolumeTask.OnVolumeChangeListener;
 import org.xbmc.lightremote.http.tasks.PlayerStopTask;
+
+import android.util.Log;
 
 public class PlayerService {
 
@@ -46,7 +50,7 @@ public class PlayerService {
 		return sThis;
 	}
 	
-	private PlayerService() {
+	protected PlayerService() {
 		
 	}
 	
@@ -108,20 +112,20 @@ public class PlayerService {
 	}
 
 	public void reqSeek(double percent) {
-		mListener.onActionStart(ACTION_SEEK);
-		PlayerSeekTask task = new PlayerSeekTask(mPlayerId, percent);
-		task.addListener(new HttpTaskListener<Boolean>() {
-
-			@Override
-			public void onSuccess(Boolean result) {
-				mListener.onActionCompleted(ACTION_SEEK);
-			}
-
-			@Override
-			public void onFailed(String message, int code) {
-				mListener.onActionError(ACTION_SEEK, message);
-			}
-		});
+//		mListener.onActionStart(ACTION_SEEK);
+//		PlayerSeekTask task = new PlayerSeekTask(mPlayerId, percent);
+//		task.addListener(new HttpTaskListener<Boolean>() {
+//
+//			@Override
+//			public void onSuccess(Boolean result) {
+//				mListener.onActionCompleted(ACTION_SEEK);
+//			}
+//
+//			@Override
+//			public void onFailed(String message, int code) {
+//				mListener.onActionError(ACTION_SEEK, message);
+//			}
+//		});
 	}
 	
 	public void reqVolume(int volume) {
@@ -277,4 +281,24 @@ public class PlayerService {
 		mListener = listener;
 	}
 
+	public void setVolume(int volume) {
+		PlayerSetVolumeTask task = new PlayerSetVolumeTask(volume);
+//		task.setOnVolumeChangeListener(new OnVolumeChangeListener() {
+//
+//			@Override
+//			public void onVolumeChange(int volume) {
+//				
+//			}
+//			
+//		});
+		task.run();
+	}
+	
+	public void setPosition(double percent) {
+		Log.i(Application.APP_NAME, "go to: " + percent);
+
+		PlayerSeekTask task = new PlayerSeekTask(percent);
+		task.run(1);
+	}
+	
 }

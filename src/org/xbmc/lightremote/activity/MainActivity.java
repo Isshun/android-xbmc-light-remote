@@ -1,7 +1,5 @@
 package org.xbmc.lightremote.activity;
 
-import java.io.File;
-
 import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.data.MovieModel;
@@ -13,8 +11,9 @@ import org.xbmc.lightremote.fragment.PlayingGestureFragment;
 import org.xbmc.lightremote.http.HttpTask.HttpTaskListener;
 import org.xbmc.lightremote.http.IServiceListener;
 import org.xbmc.lightremote.http.tasks.PlayerGetCurrentTask;
-import org.xbmc.lightremote.service.ImageService;
 import org.xbmc.lightremote.service.PlayerService;
+import org.xbmc.lightremote.service.ServiceManager;
+import org.xbmc.lightremote.view.PlayerView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenListener;
@@ -22,19 +21,18 @@ import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -43,14 +41,22 @@ import android.widget.TextView;
 
 public class MainActivity extends SlidingFragmentActivity implements OnClickListener, IServiceListener {
 
-	private PlayerService 			mService;
-	private Menu mMenu;
+	private static final int 	MODE_GENRES = 0;
+	private static final int 	MODE_LIBRARY = 1;
+	
+	private PlayerService 		mService;
+	private PlayerView 			mPlayer;
+	private Menu 				mMenu;
+	private int					mMode;
+	private int 				mVolume;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		mVolume = 80;
+		
     	mService = PlayerService.getInstance();
 		mService.setListener(this);
 
@@ -76,24 +82,6 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		findViewById(R.id.view_playing).setOnClickListener(this);
 		findViewById(R.id.bt_library_movies).setOnClickListener(this);
 		findViewById(R.id.bt_library_series).setOnClickListener(this);
-
-		// Initialize first fragment
-		final FragmentManager fragmentManager = getSupportFragmentManager();
-		final FragmentTransaction ft = fragmentManager.beginTransaction();
-		
-		LibraryFilterFragment fragment = new LibraryFilterFragment();
-		fragment.setOnCategoryChangeListener(new OnCategoryChangeListener() {
-
-			@Override
-			public void onCategoryChange(String category) {
-				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-				fragmentTransaction.replace(R.id.layout_main, new LibraryMoviesFragment());
-				fragmentTransaction.commit();
-			}
-			
-		});
-		ft.replace(R.id.layout_main, fragment);
-		ft.commit();
 		
 		// Adapter
 		SpinnerAdapter adapter = ArrayAdapter.createFromResource(this, R.array.actions, android.R.layout.simple_spinner_dropdown_item);
@@ -115,6 +103,71 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		actions.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actions.setDisplayShowTitleEnabled(false);
 		actions.setListNavigationCallbacks(adapter, callback);
+		
+		displayGenres();
+	}
+	
+	public void displayLibrary(String genre) {
+		final FragmentManager fragmentManager = getSupportFragmentManager();
+		final FragmentTransaction ft = fragmentManager.beginTransaction();
+		final Fragment fragment = new LibraryMoviesFragment();
+
+		Bundle args = new Bundle();
+		args.putString("genre", genre);
+		fragment.setArguments(args);
+		ft.replace(R.id.layout_main, fragment);
+		ft.commit();
+		
+		mMode = MODE_LIBRARY;
+	}
+	
+	public void displayGenres() {
+		final FragmentManager fragmentManager = getSupportFragmentManager();
+		final FragmentTransaction ft = fragmentManager.beginTransaction();
+		LibraryFilterFragment fragment = new LibraryFilterFragment();
+		fragment.setOnCategoryChangeListener(new OnCategoryChangeListener() {
+
+			@Override
+			public void onCategoryChange(String genre) {
+				displayLibrary(genre);
+			}
+			
+		});
+		ft.replace(R.id.layout_main, fragment);
+		ft.commit();
+
+		mMode = MODE_GENRES;
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_BACK:
+			if (mMode == MODE_LIBRARY) {
+				displayGenres();
+			} else {
+				getSlidingMenu().toggle();
+			}
+			return true;
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			mVolume += 5;
+			ServiceManager.getPlayerService().setVolume(mVolume);
+//			audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+//			//Raise the Volume Bar on the Screen
+//			volumeControl.setProgress( audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) + AudioManager.ADJUST_RAISE);
+           return true;
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			mVolume -= 5;
+			ServiceManager.getPlayerService().setVolume(mVolume);
+//			//Adjust the Volume
+//			audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+//			//Lower the VOlume Bar on the Screen
+//			volumeControl.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) + AudioManager.ADJUST_LOWER);
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	@Override
@@ -122,31 +175,8 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		super.onResume();
 //		mService.reqPlaying();
 //		mService.reqProperties();
-		
-		// Fill player
-		final TextView lbPlayer = (TextView)findViewById(R.id.lb_player_name);
-		lbPlayer.setText("...");
-		final ImageView btPlayer = (ImageView)findViewById(R.id.bt_player);
-		PlayerGetCurrentTask task = new PlayerGetCurrentTask();
-		task.addListener(new HttpTaskListener<MovieModel>() {
 
-			@Override
-			public void onSuccess(MovieModel movie) {
-				Log.e(Application.APP_NAME, "success");
-				if (movie != null && lbPlayer != null) {
-					lbPlayer.setText(movie.getTitle());
-				}
-			}
-
-			@Override
-			public void onFailed(String message, int code) {
-				Log.e(Application.APP_NAME, "failed: " + message);
-				if (lbPlayer != null) {
-					lbPlayer.setText("");
-				}
-			}
-		});
-		task.run(1);
+		final PlayerView player = (PlayerView)findViewById(R.id.player);
 	}
 	
 	@Override

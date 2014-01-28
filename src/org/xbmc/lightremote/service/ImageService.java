@@ -1,16 +1,41 @@
 package org.xbmc.lightremote.service;
 
+import java.util.List;
+
 import org.xbmc.lightremote.Application;
 import org.xbmc.lightremote.R;
+import org.xbmc.lightremote.data.MovieModel;
+import org.xbmc.lightremote.http.FileDownloadTask;
+import org.xbmc.lightremote.http.HttpTask;
+import org.xbmc.lightremote.http.IDownloadTaskDelegate;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Picasso.Listener;
+import com.squareup.picasso.Picasso.Builder;
 
+import android.net.Uri;
+import android.util.Log;
 import android.widget.ImageView;
 
 public class ImageService {
-
+	
 	private static ImageService sSelf;
+	private Picasso mPicasso;
 
+	private ImageService() {
+		Builder builder = new Picasso.Builder(Application.getContext());
+		builder.listener(new Listener() {
+			
+			@Override
+			public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+				Log.d(Application.APP_NAME, "ImageService: load " + exception.getMessage());
+			}
+		});
+		
+		mPicasso = builder.build();
+		mPicasso.setDebugging(true);
+	}
+	
 	public static ImageService getInstance() {
 		if (sSelf == null) {
 			sSelf = new ImageService();
@@ -19,27 +44,68 @@ public class ImageService {
 	}
 
 	public void showThumb(ImageView image, String url) {
-		Picasso.with(Application.getContext()).setDebugging(true);
-		Picasso.with(Application.getContext())
-        .load(url)
-        .resize(240, 340)
-        .placeholder(R.drawable.icon)
+		Log.d(Application.APP_NAME, "ImageService: load " + url);
+
+		mPicasso.load(url)
+        .resize(240, 320)
+        .placeholder(R.drawable.placeholder)
         .into(image);
 	}
 
 	public void showHeader(ImageView image, String url) {
-		Picasso.with(Application.getContext()).setDebugging(true);
-		Picasso.with(Application.getContext())
+		mPicasso
         .load(url)
         .resize(810, 540)
         .into(image);
 	}
 
 	public void showFullscreen(ImageView image, String url) {
-		Picasso.with(Application.getContext()).setDebugging(true);
-		Picasso.with(Application.getContext())
+		mPicasso
         .load(url)
         .into(image);
+	}
+
+	public void init(List<MovieModel> movies) {
+		Log.d(Application.APP_NAME, "ImageService: init");
+		
+		for (MovieModel movie: movies) {
+			mPicasso.load(movie.getThumbnail()).fetch();
+////			String filename = "thumb_" + movie.getMovieId() + ".jpg";
+//			String filename = Base64.encodeToString(movie.getThumbnail().getBytes(), Base64.DEFAULT);
+//			File path = new File(Application.getContext().getExternalCacheDir(), filename);
+//			if (!path.exists()) {
+//				download(movie.getThumbnail(), path.getAbsolutePath());
+//			} else {
+//				Log.d(Application.APP_NAME, "ImageService: path " + path + " exists");
+//			}
+		}
+	}
+
+	private void download(String url, String path) {
+		Log.d(Application.APP_NAME, "ImageService: download to" + path);
+
+		FileDownloadTask task = new FileDownloadTask(new IDownloadTaskDelegate() {
+			
+			@Override
+			public void onTaskError(HttpTask task, String message, int statusCode) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onTaskCompleted(HttpTask task, Object data) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onProgress(int progress) {
+				// TODO Auto-generated method stub
+				
+			}
+		}, null);
+		
+		task.execute(url, path);
 	}
 
 }

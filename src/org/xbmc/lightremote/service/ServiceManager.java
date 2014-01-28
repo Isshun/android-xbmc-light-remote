@@ -3,6 +3,7 @@ package org.xbmc.lightremote.service;
 public abstract class ServiceManager {
 
 	private static LibraryService sLibraryService;
+	private static PlayerService sPlayerService;
 	private static TaskManager sTaskManager;
 	
 	public static LibraryService getLibraryService() {
@@ -17,6 +18,13 @@ public abstract class ServiceManager {
 			sTaskManager = new TaskManager();
 		}
 		return sTaskManager;
+	}
+
+	public static PlayerService getPlayerService() {
+		if (sPlayerService == null) {
+			sPlayerService = new PlayerServiceXBMC();
+		}
+		return sPlayerService;
 	}
 	
 }

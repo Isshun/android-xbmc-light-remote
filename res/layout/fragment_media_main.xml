@@ -99,17 +99,6 @@
                     android:text="Sci-Fi / 2013"
                     android:textColor="#888"
                     android:textSize="12sp" />
-
-                <View
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
-
-                <TextView
-                    android:id="@+id/lb_duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="160 minutes"
-                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 

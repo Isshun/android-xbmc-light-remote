@@ -1,7 +1,13 @@
 package org.xbmc.lightremote.service;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.http.FileDownloadTask;
@@ -20,10 +26,30 @@ public abstract class LibraryService {
 //	}
 //	
 	private FileDownloadTask mFileDownloadTask;
+	protected Map<String, List<MovieModel>> mGenres;
 
+	protected LibraryService() {
+		mGenres = new HashMap<String, List<MovieModel>>();
+		mGenres.put("", new ArrayList<MovieModel>());
+	}
+	
 	public abstract void getMovies(HttpTaskListener<List<MovieModel>> listener);
 	public abstract void getMovie(HttpTaskListener<MovieModel> listener, int movieId);
-	
+	public abstract void getMovies(HttpTaskListener<List<MovieModel>> httpTaskListener, String genre);
+
+	public void addMovieToGenre(String genre, MovieModel m) {
+		if (mGenres.containsKey(genre) == false) {
+			mGenres.put(genre, new ArrayList<MovieModel>());
+		}
+		mGenres.get(genre).add(m);
+	}
+
+	public List<String> getGenres() {
+		List<String> genres = new ArrayList<String>(mGenres.keySet());
+		Collections.sort(genres);
+		return genres;
+	}
+
 //	public void download(final IDownloadTaskDelegate mFileDelegate, String thumbnail, final String thumbnailPath) {
 ////		Log.i(App.APP_NAME, String.format("file download: %s", thumbnail));
 //

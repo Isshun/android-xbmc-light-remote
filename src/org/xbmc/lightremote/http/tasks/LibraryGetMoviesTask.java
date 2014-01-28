@@ -7,11 +7,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xbmc.lightremote.Application;
+import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IDownloadTaskDelegate;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 import org.xbmc.lightremote.service.CacheManager;
+import org.xbmc.lightremote.service.LibraryService;
+import org.xbmc.lightremote.service.ServiceManager;
 
 import android.util.Log;
 
@@ -57,12 +60,13 @@ public class LibraryGetMoviesTask extends HttpTask<List<MovieModel>> {
 		super(0);
 		
 		mCache = CacheManager.getInstance();
-		
+
+		final LibraryService library = ServiceManager.getLibraryService();
+
 		mStrategy = new HttpTaskStrategy<List<MovieModel>>() {
 			@Override
 			public List<MovieModel> execute(JSONObject obj) {
 				List<MovieModel> movies = new ArrayList<MovieModel>();
-			    String cacheDir = Application.getContext().getFilesDir().getAbsolutePath();
 				
 				try {
 					JSONObject result = obj.getJSONObject("result");
@@ -71,6 +75,9 @@ public class LibraryGetMoviesTask extends HttpTask<List<MovieModel>> {
 						JSONObject data = array.getJSONObject(i);
 						
 						MovieModel m = MovieModel.fromJSON(data);
+						for (String genre: m.getGenres()) {
+							library.addMovieToGenre(genre, m);
+						}
 						
 //						// Thumbnail
 //						if (m.getThumbnail() != null) {

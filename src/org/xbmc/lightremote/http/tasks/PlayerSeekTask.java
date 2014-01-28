@@ -7,18 +7,16 @@ import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 
 public class PlayerSeekTask extends HttpTask<Boolean> {
 
-	public PlayerSeekTask(int mPlayerId, double percent) {
+	private double mPercent;
+
+	public PlayerSeekTask(double percent) {
 		super(0);
-		String params = String.format(Locale.ENGLISH, "{ \"playerid\": %d, \"value\": %f }", mPlayerId, percent);
-		run("Player.Seek", "Seek", params);
+		mPercent = percent;
 	}
 	
-	@Override
-	protected Boolean doInBackground(String... params) {
-		if (super.doInBackground(params)) {
-			return true;
-		}
-		return false;
+	public void run(int playerId) {
+		String params = String.format(Locale.ENGLISH, "{ \"playerid\": %d, \"value\": %f }", playerId, mPercent);
+		run("Player.Seek", "Seek", params);
 	}
 	
 }

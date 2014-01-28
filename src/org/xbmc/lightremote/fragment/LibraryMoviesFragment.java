@@ -3,16 +3,13 @@ package org.xbmc.lightremote.fragment;
 import java.util.List;
 
 import org.xbmc.lightremote.R;
-import org.xbmc.lightremote.activity.DetailActivity;
 import org.xbmc.lightremote.activity.MediaActivity;
 import org.xbmc.lightremote.adapters.MovieAdapter;
 import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.http.HttpTask.HttpTaskListener;
-import org.xbmc.lightremote.http.IServiceListener;
 import org.xbmc.lightremote.service.PlayerService;
 import org.xbmc.lightremote.service.ServiceManager;
 
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,17 +23,16 @@ import android.widget.ProgressBar;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.support.v4.app.NotificationCompat.Builder;
 
 public class LibraryMoviesFragment extends Fragment implements OnItemClickListener, OnClickListener {
-    private PlayerService 		mService;
 	private MovieAdapter 		mMovieAdapter;
 	private ProgressBar 		mProgress;
 	private ListView 			mListview;
 	private GridView 			mGridview;
 	private TextView 			mLbError;
 	private View 				mLayoutError;
-	private boolean 			mGridMode = true; 
+	private boolean 			mGridMode = true;
+	private String 				mGenre; 
 
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,6 +40,8 @@ public class LibraryMoviesFragment extends Fragment implements OnItemClickListen
     	// Inflate the layout for this fragment
     	View v = inflater.inflate(R.layout.fragment_library_collection, container, false); 
 
+    	mGenre = getArguments().getString("genre");
+    	
 		mMovieAdapter = new MovieAdapter(getActivity());
 		//mMovieAdapter.setLayout(R.layout.list_item_movie);
 		mMovieAdapter.setLayout(R.layout.grid_item_movie);
@@ -94,7 +92,7 @@ public class LibraryMoviesFragment extends Fragment implements OnItemClickListen
 				mLbError.setText(message);
 				showError();
 			}
-		});
+		}, mGenre);
 	}
 
 	@Override
@@ -136,6 +134,7 @@ public class LibraryMoviesFragment extends Fragment implements OnItemClickListen
 		Intent intent = new Intent(getActivity(), MediaActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		intent.putExtra("movie", mMovieAdapter.getItem(pos));
+		intent.putExtra("genre", mGenre);
 		intent.putExtra("position", pos);
 		startActivityForResult(intent, 1);
 	}

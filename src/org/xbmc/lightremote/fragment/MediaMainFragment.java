@@ -26,6 +26,7 @@ public class MediaMainFragment extends Fragment {
 		final TextView lbTitle = (TextView)rootView.findViewById(R.id.lb_title);
 		final TextView lbSaga = (TextView)rootView.findViewById(R.id.lb_saga);
 		final TextView lbDuration= (TextView)rootView.findViewById(R.id.lb_duration);
+		final TextView lbCategory = (TextView)rootView.findViewById(R.id.lb_category);
 		final TextView lbDesc = (TextView)rootView.findViewById(R.id.lb_desc);
 		final ImageView imgCover = (ImageView)rootView.findViewById(R.id.img_cover);
 		final ImageView imgFan= (ImageView)rootView.findViewById(R.id.img_fan);
@@ -37,9 +38,10 @@ public class MediaMainFragment extends Fragment {
 			public void onSuccess(final MovieModel movie) {
 				if (movie != null) {
 					lbTitle.setText(movie.getTitle());
-					lbSaga.setText(String.valueOf(movie.getRating()));
-					lbDuration.setText(String.valueOf(movie.getDuration()));
+					lbSaga.setText(String.valueOf(movie.getRating()) + " / " + movie.getFormatedDuration());
+					//lbDuration.setText(String.valueOf(movie.getFormatedDuration()));
 					lbDesc.setText(movie.getPlot());
+					lbCategory.setText(movie.getFormatedGenres());
 					ImageService.getInstance().showThumb(imgCover, movie.getThumbnail());
 					ImageService.getInstance().showHeader(imgFan, movie.getFanart());
 					imgFan.setOnClickListener(new OnClickListener() {

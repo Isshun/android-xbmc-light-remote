@@ -3,23 +3,28 @@ package org.xbmc.lightremote.http.tasks;
 import java.util.Locale;
 
 import org.xbmc.lightremote.http.HttpTask;
-import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 
 public class PlayerSetVolumeTask extends HttpTask<Boolean> {
 
+	public static interface OnVolumeChangeListener {
+		void onVolumeChange(int volume);
+	}
+	
+	private int mVolume;
+	private OnVolumeChangeListener mListener;
+
 	public PlayerSetVolumeTask(int volume) {
 		super(0);
+		mVolume = volume;
+	}
 
-		String params = String.format(Locale.ENGLISH, "{ \"volume\": %d }", volume);
+	public void run() {
+		String params = String.format(Locale.ENGLISH, "{ \"volume\": %d }", mVolume);
 		run("Application.SetVolume", "SetVolume", params);
 	}
 	
-	@Override
-	protected Boolean doInBackground(String... params) {
-		if (super.doInBackground(params)) {
-			return true;
-		}
-		return false;
+	public void setOnVolumeChangeListener(OnVolumeChangeListener listener) {
+		mListener = listener;
 	}
 	
 }

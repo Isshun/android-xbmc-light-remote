@@ -3,14 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:background="#58b" >
+    android:background="@drawable/bg_tile" >
 
     <TextView
         android:id="@+id/lb_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="top|left"
+        android:layout_margin="15dp"
         android:text="TextView"
-        android:textColor="#fff" />
+        android:textColor="@color/text"
+        android:textSize="22sp" />
 
 </FrameLayout>

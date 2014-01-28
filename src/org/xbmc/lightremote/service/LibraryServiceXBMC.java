@@ -41,6 +41,26 @@ public class LibraryServiceXBMC extends LibraryService {
 	}
 
 	@Override
+	public void getMovies(final HttpTaskListener<List<MovieModel>> listener, final String genre) {
+		if ("".equals(genre)) {
+			getMovies(listener);
+		} else {
+			getMovies(new HttpTaskListener<List<MovieModel>>() {
+	
+				@Override
+				public void onSuccess(List<MovieModel> result) {
+					listener.onSuccess(mGenres.get(genre));
+				}
+	
+				@Override
+				public void onFailed(String message, int code) {
+					listener.onFailed(message, code);
+				}
+			});
+		}
+	}
+
+	@Override
 	public void getMovie(final HttpTaskListener<MovieModel> listener, final int movieId) {
 		if (mMovies != null) {
 			listener.onSuccess(getMovie(mMovies, movieId));
@@ -59,7 +79,7 @@ public class LibraryServiceXBMC extends LibraryService {
 			});
 		}
 	}
-
+	
 	private MovieModel getMovie(List<MovieModel> movies, int movieId) {
 		for (MovieModel movie: movies) {
 			if (movie.getMovieId() == movieId) {
@@ -68,4 +88,5 @@ public class LibraryServiceXBMC extends LibraryService {
 		}
 		return null;
 	}
+
 }

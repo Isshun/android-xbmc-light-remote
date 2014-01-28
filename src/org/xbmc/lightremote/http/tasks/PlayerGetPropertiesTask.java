@@ -1,13 +1,10 @@
 package org.xbmc.lightremote.http.tasks;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xbmc.lightremote.data.PlayingProperties;
 import org.xbmc.lightremote.http.HttpTask;
-import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 import org.xbmc.lightremote.http.IPlayerTask;
-import org.xbmc.lightremote.http.HttpTask.HttpTaskStrategy;
 
 public class PlayerGetPropertiesTask extends HttpTask<PlayingProperties> implements IPlayerTask {
 
@@ -20,7 +17,8 @@ public class PlayerGetPropertiesTask extends HttpTask<PlayingProperties> impleme
 			@Override
 			public PlayingProperties execute(JSONObject obj) {
 				try {
-					return PlayingProperties.Create(obj.getJSONObject("result"));
+					PlayingProperties properties = PlayingProperties.Create(obj.getJSONObject("result"));
+					return properties;
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

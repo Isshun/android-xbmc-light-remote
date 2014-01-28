@@ -2,7 +2,11 @@ package org.xbmc.lightremote.data;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,26 +15,30 @@ import android.os.Parcelable;
 
 public class MovieModel implements Parcelable  {
 	
-	private String 	file;
-	private String 	label;
-	private String 	thumbnailPath;
-	private int 	duration;
-	private int 	movieId;
+	private String 			mMediaFile;
+	private String 			mLabel;
+	private int 			mDuration;
+	private int 			movieId;
+	private int 			mPlayCount;
+	private double 			mRating;
+	private String 			mThumbnail;
+	private String 			mToster;
+	private String 			mFanart;
+	private String 			mPlot;
+	private String 			mTitle;
+	private String 			mWriter;
+	private String 			mDirector;
+	private List<String>	mGenres;
+	private String			mFormatedGenre;
 
 	public static Parcelable.Creator<MovieModel> getCreator() {
 		return CREATOR;
 	}
 
-	private int 	playCount;
-	private double 	rating;
-	private String 	thumbnail;
-	private String 	poster;
-	private String 	fanart;
-	private String 	plot;
-	private String 	title;
-	private String 	writer;
-	private String 	director;
-
+	private MovieModel() {
+		mGenres = new ArrayList<String>();
+	}
+	
 	public static MovieModel fromJSON(JSONObject obj) throws JSONException {
 		MovieModel m = new MovieModel();
 		
@@ -41,22 +49,30 @@ public class MovieModel implements Parcelable  {
 		}
 
 		// Properties
-		m.title= getString(obj, "title");
-		m.label = getString(obj, "label");
-		m.thumbnail = cleanUrl(getString(obj, "thumbnail"));
-		m.plot = getString(obj, "plot");
-		m.director= getString(obj, "director");
-		m.writer= getString(obj, "writer");
-		m.playCount = getInt(obj, "playcount");
+		m.mTitle= getString(obj, "title");
+		m.mLabel = getString(obj, "label");
+		m.mThumbnail = cleanUrl(getString(obj, "thumbnail"));
+		m.mPlot = getString(obj, "plot");
+		m.mDirector = getString(obj, "director");
+		m.mWriter = getString(obj, "writer");
+		m.mPlayCount = getInt(obj, "playcount");
 		if (obj.has("rating")) {
-			m.rating = obj.getDouble("rating");
+			m.mRating = (double)((int)(obj.getDouble("rating") * 10)) / 10;
 		}
-		m.file = getString(obj, "file");
+		m.mMediaFile = getString(obj, "file");
+
+		if (obj.has("genre")) {
+			JSONArray array = obj.getJSONArray("genre");
+			for (int i = 0; i < array.length(); i++) {
+				String genre = array.getString(i);
+				m.mGenres.add(genre);
+			}
+		}
 		
 		if (obj.has("art")) {
 			JSONObject art = obj.getJSONObject("art");
-			m.poster = cleanUrl(getString(art, "poster"));
-			m.fanart = cleanUrl(getString(art, "fanart"));
+			m.mToster = cleanUrl(getString(art, "poster"));
+			m.mFanart = cleanUrl(getString(art, "fanart"));
 		}
 		
 		// Streamdetails
@@ -67,7 +83,7 @@ public class MovieModel implements Parcelable  {
 
 				// Duration
 				if (video.has("duration"))
-					m.duration = video.getInt("duration");
+					m.mDuration = video.getInt("duration");
 			}
 		}
 		
@@ -98,41 +114,49 @@ public class MovieModel implements Parcelable  {
 
 	private static String cleanUrl(String url) {
 		if (url != null) {
-			url = url.replace("image://", "");
-			try {
-				url = URLDecoder.decode(url, "UTF-8");
-				return url;
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
+		try {
+			return "http://192.168.1.22/vfs/" + URLEncoder.encode(url, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}
 		return null;
+
+		
+//		if (url != null) {
+//			url = url.replace("image://", "");
+//			try {
+//				url = URLDecoder.decode(url, "UTF-8");
+//				return url;
+//			} catch (UnsupportedEncodingException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		return null;
 	}
 
-	public MovieModel() {
-	}
-	
 	public MovieModel(Parcel in) {
-		this.file= in.readString();
-		this.label = in.readString();
-		this.thumbnailPath = in.readString();
-		this.thumbnail = in.readString();
-		this.duration = in.readInt();
+		this.mMediaFile= in.readString();
+		this.mLabel = in.readString();
+//		this.mThumbnailPath = in.readString();
+		this.mThumbnail = in.readString();
+		this.mDuration = in.readInt();
 		this.movieId = in.readInt();
-		this.playCount = in.readInt();
-		this.rating = in.readDouble();
+		this.mPlayCount = in.readInt();
+		this.mRating = in.readDouble();
 	}
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(file);
-		dest.writeString(label);
-		dest.writeString(thumbnailPath);
-		dest.writeString(thumbnail);
-		dest.writeInt(duration);
+		dest.writeString(mMediaFile);
+		dest.writeString(mLabel);
+//		dest.writeString(mThumbnailPath);
+		dest.writeString(mThumbnail);
+		dest.writeInt(mDuration);
 		dest.writeInt(movieId);
-		dest.writeInt(playCount);
-		dest.writeDouble(rating);
+		dest.writeInt(mPlayCount);
+		dest.writeDouble(mRating);
 	}
 	
 	@Override
@@ -156,27 +180,23 @@ public class MovieModel implements Parcelable  {
 	};
 
 	public String getThumbnail() {
-		return thumbnail;
+		return mThumbnail;
 	}
 
 	public String getFanart() {
-		return fanart;
+		return mFanart;
 	}
 	
 	public String getFile() {
-		return file;
+		return mMediaFile;
 	}
 
 	public String getLabel() {
-		return label;
-	}
-
-	public String getThumbnailPath() {
-		return thumbnailPath;
+		return mLabel;
 	}
 
 	public int getDuration() {
-		return duration;
+		return mDuration;
 	}
 
 	public int getMovieId() {
@@ -184,31 +204,60 @@ public class MovieModel implements Parcelable  {
 	}
 
 	public int getPlayCount() {
-		return playCount;
+		return mPlayCount;
 	}
 
 	public double getRating() {
-		return rating;
+		return mRating;
 	}
 
 	public String getPoster() {
-		return poster;
+		return mToster;
 	}
 
 	public String getPlot() {
-		return plot;
+		return mPlot;
 	}
 
 	public String getTitle() {
-		return title;
+		return mTitle;
 	}
 
 	public String getWriter() {
-		return writer;
+		return mWriter;
 	}
 
 	public String getDirector() {
-		return director;
+		return mDirector;
+	}
+
+	public List<String> getGenres() {
+		return mGenres;
+	}
+
+	public String getFormatedGenres() {
+		if (mFormatedGenre == null) {
+			StringBuilder sb = new StringBuilder();
+			if (mGenres != null) {
+				boolean first = true;
+				for (String genre: mGenres) {
+					if (!first) sb.append(" | ");
+					sb.append(genre);
+					first = false;
+				}
+				mFormatedGenre = sb.toString();
+			}
+		}
+		return mFormatedGenre;
+	}
+
+	public String getFormatedDuration() {
+		int duration = mDuration / 60;
+		int min = (int)(duration % 60);
+		if (duration > 60) {
+			return (int)(duration / 60) + "h" + (min < 10 ? "0" : "") + min + "min";
+		}
+		return (min < 10 ? "0" : "") + min + "min";
 	}
 
 }
