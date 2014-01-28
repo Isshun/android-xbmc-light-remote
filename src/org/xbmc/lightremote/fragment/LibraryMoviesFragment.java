@@ -136,6 +136,7 @@ public class LibraryMoviesFragment extends Fragment implements OnItemClickListen
 		Intent intent = new Intent(getActivity(), MediaActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		intent.putExtra("movie", mMovieAdapter.getItem(pos));
+		intent.putExtra("position", pos);
 		startActivityForResult(intent, 1);
 	}
 

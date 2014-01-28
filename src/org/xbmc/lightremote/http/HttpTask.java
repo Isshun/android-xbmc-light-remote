@@ -78,7 +78,9 @@ public abstract class HttpTask<TResult> extends AsyncTask<String, Integer, TResu
 		if (mCache != null && mCache.isCached(cmd)) {
 	        if (mStrategy != null) {
 	        	try {
-					return mStrategy.execute(new JSONObject(mCache.get(cmd)));
+	        		String res = mCache.get(cmd);
+	        		Log.v(Application.APP_NAME, res);
+					return mStrategy.execute(new JSONObject(res));
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -149,6 +151,7 @@ public abstract class HttpTask<TResult> extends AsyncTask<String, Integer, TResu
 	
 			try {
 				String res = sb.toString();
+        		Log.v(Application.APP_NAME, res);
 				if (mCache != null) {
 					mCache.set(cmd, res);
 				}

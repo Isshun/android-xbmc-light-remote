@@ -115,34 +115,38 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		actions.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actions.setDisplayShowTitleEnabled(false);
 		actions.setListNavigationCallbacks(adapter, callback);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+//		mService.reqPlaying();
+//		mService.reqProperties();
 		
 		// Fill player
 		final TextView lbPlayer = (TextView)findViewById(R.id.lb_player_name);
+		lbPlayer.setText("...");
 		final ImageView btPlayer = (ImageView)findViewById(R.id.bt_player);
 		PlayerGetCurrentTask task = new PlayerGetCurrentTask();
 		task.addListener(new HttpTaskListener<MovieModel>() {
 
 			@Override
 			public void onSuccess(MovieModel movie) {
-				if (movie != null) {
+				Log.e(Application.APP_NAME, "success");
+				if (movie != null && lbPlayer != null) {
 					lbPlayer.setText(movie.getTitle());
 				}
 			}
 
 			@Override
 			public void onFailed(String message, int code) {
-				// TODO Auto-generated method stub
-				
+				Log.e(Application.APP_NAME, "failed: " + message);
+				if (lbPlayer != null) {
+					lbPlayer.setText("");
+				}
 			}
 		});
-		task.run(0);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		mService.reqPlaying();
-		mService.reqProperties();
+		task.run(1);
 	}
 	
 	@Override

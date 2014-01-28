@@ -1,15 +1,18 @@
 package org.xbmc.lightremote.fragment;
 
+import org.xbmc.lightremote.GalleryActivity;
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.http.HttpTask.HttpTaskListener;
 import org.xbmc.lightremote.service.ImageService;
 import org.xbmc.lightremote.service.ServiceManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,7 +34,7 @@ public class MediaMainFragment extends Fragment {
 		ServiceManager.getLibraryService().getMovie(new HttpTaskListener<MovieModel>() {
 
 			@Override
-			public void onSuccess(MovieModel movie) {
+			public void onSuccess(final MovieModel movie) {
 				if (movie != null) {
 					lbTitle.setText(movie.getTitle());
 					lbSaga.setText(String.valueOf(movie.getRating()));
@@ -39,6 +42,15 @@ public class MediaMainFragment extends Fragment {
 					lbDesc.setText(movie.getPlot());
 					ImageService.getInstance().showThumb(imgCover, movie.getThumbnail());
 					ImageService.getInstance().showHeader(imgFan, movie.getFanart());
+					imgFan.setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							Intent intent = new Intent(getActivity(), GalleryActivity.class);
+							intent.putExtra("img", movie.getFanart());
+							startActivity(intent);
+						}
+					});
 				}
 			}
 

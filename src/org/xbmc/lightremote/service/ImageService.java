@@ -35,4 +35,11 @@ public class ImageService {
         .into(image);
 	}
 
+	public void showFullscreen(ImageView image, String url) {
+		Picasso.with(Application.getContext()).setDebugging(true);
+		Picasso.with(Application.getContext())
+        .load(url)
+        .into(image);
+	}
+
 }

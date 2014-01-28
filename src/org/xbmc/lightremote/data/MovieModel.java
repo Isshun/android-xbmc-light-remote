@@ -48,7 +48,9 @@ public class MovieModel implements Parcelable  {
 		m.director= getString(obj, "director");
 		m.writer= getString(obj, "writer");
 		m.playCount = getInt(obj, "playcount");
-		m.rating = obj.getDouble("rating");
+		if (obj.has("rating")) {
+			m.rating = obj.getDouble("rating");
+		}
 		m.file = getString(obj, "file");
 		
 		if (obj.has("art")) {

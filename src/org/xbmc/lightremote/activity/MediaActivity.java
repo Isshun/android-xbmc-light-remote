@@ -46,8 +46,9 @@ public class MediaActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_media);
 		
+		final int position = getIntent().getExtras().getInt("position", 0);
+		
 		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mViewPager.setCurrentItem(1);
 		mViewPager.setPersistentDrawingCache(ViewGroup.PERSISTENT_ALL_CACHES);
 		
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -61,6 +62,7 @@ public class MediaActivity extends FragmentActivity {
 			@Override
 			public void onSuccess(List<MovieModel> movies) {
 				mMovies = movies;
+				mViewPager.setCurrentItem(position);
 				mSectionsPagerAdapter.notifyDataSetChanged();
 			}
 
