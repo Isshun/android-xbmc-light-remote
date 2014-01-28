@@ -5,7 +5,7 @@ import java.util.List;
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.R.id;
 import org.xbmc.lightremote.R.layout;
-import org.xbmc.lightremote.activities.DetailActivity;
+import org.xbmc.lightremote.activity.DetailActivity;
 import org.xbmc.lightremote.adapters.MovieAdapter;
 import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.data.PlayingProperties;

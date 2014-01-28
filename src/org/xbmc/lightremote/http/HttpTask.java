@@ -20,14 +20,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xbmc.lightremote.Application;
+import org.xbmc.lightremote.service.CacheManager;
 
 public abstract class HttpTask<TResult> extends AsyncTask<String, Integer, TResult> {
 	
+	protected CacheManager 				mCache;
 	private DefaultHttpClient			mHttpClient;
 	private String 						mErrorMessage;
 	private int 						mId;
 	private boolean 					mComplete;
-	protected JSONObject 				mJson;
 	private int 						mStatusCode;
 	
 	protected HttpTaskStrategy<TResult>	mStrategy;
@@ -44,12 +45,12 @@ public abstract class HttpTask<TResult> extends AsyncTask<String, Integer, TResu
 	
 	public HttpTask(int id) {
 		mId = id;
+		mListeners = new ArrayList<HttpTaskListener>();
 		
 		//Log.i(App.APP_NAME, "new WebserviceTask");
 	}
 	
 	public void addListener(HttpTaskListener<TResult> listener) {
-		mListeners = new ArrayList<HttpTaskListener>();
 		mListeners.add(listener);
 	}
 	
@@ -74,85 +75,101 @@ public abstract class HttpTask<TResult> extends AsyncTask<String, Integer, TResu
 			cmd = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"%s\", \"id\": \"%s\"}", params[0], params[1]);
 		}
 		
-	    // Create a new HttpClient and Post Header
-	    HttpClient httpclient = new DefaultHttpClient();
-	    httpclient.getParams().setBooleanParameter("http.protocol.expect-continue", false);
-        HttpResponse response = null;
-
-		HttpPost httppost = new HttpPost("http://192.168.1.22/jsonrpc");
-		String name = "alex";
-//		String password = App.getAppContext().getSharedPreferences(App.APP_NAME, 0).getString("password", null);
-		String password = "Schrodinger";
-		String auth = "Basic " + Base64.encodeToString((name + ':' + password).getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
-        httppost.setHeader("Authorization", auth);
-    	DefaultHttpClient client = new DefaultHttpClient();
-    	
-		try {
-				StringEntity se = new StringEntity(cmd);
-				se.setContentType("text/plain");
-				httppost.setHeader("Content-Type","application/json");
-				httppost.setEntity(se);
-//			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-
-        try {
-			response = client.execute(httppost);
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-        
-        // Get status code
-    	mStatusCode = response.getStatusLine().getStatusCode();
-    	if (mStatusCode != 200) {
-			mErrorMessage = response.getStatusLine().getReasonPhrase();
-			return null;
-    	}
-    	
-    	Log.i(Application.APP_NAME, String.format("code: %d", mStatusCode));
-
-    	// Get content
-	    StringBuilder sb = new StringBuilder();
-		try {
-			InputStream is = response.getEntity().getContent();
-	        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8"), 8);
-
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-			    sb.append(line + "n");
+		if (mCache != null && mCache.isCached(cmd)) {
+	        if (mStrategy != null) {
+	        	try {
+					return mStrategy.execute(new JSONObject(mCache.get(cmd)));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+		} else {
+			
+		    // Create a new HttpClient and Post Header
+		    HttpClient httpclient = new DefaultHttpClient();
+		    httpclient.getParams().setBooleanParameter("http.protocol.expect-continue", false);
+	        HttpResponse response = null;
+	
+			HttpPost httppost = new HttpPost("http://192.168.1.22/jsonrpc");
+			String name = "alex";
+	//		String password = App.getAppContext().getSharedPreferences(App.APP_NAME, 0).getString("password", null);
+			String password = "Schrodinger";
+			String auth = "Basic " + Base64.encodeToString((name + ':' + password).getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
+	        httppost.setHeader("Authorization", auth);
+	    	DefaultHttpClient client = new DefaultHttpClient();
+	    	
+			try {
+					StringEntity se = new StringEntity(cmd);
+					se.setContentType("text/plain");
+					httppost.setHeader("Content-Type","application/json");
+					httppost.setEntity(se);
+	//			}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
 			}
-			is.close();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			mJson = new JSONObject(sb.toString());
-
-			// API error
-			if (mJson.has("error")) {
-				mErrorMessage = mJson.getJSONObject("error").getString("message");
+	
+	        try {
+				response = client.execute(httppost);
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 				return null;
 			}
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
+	        
+	        // Get status code
+	    	mStatusCode = response.getStatusLine().getStatusCode();
+	    	if (mStatusCode != 200) {
+				mErrorMessage = response.getStatusLine().getReasonPhrase();
+				return null;
+	    	}
+	    	
+	    	Log.i(Application.APP_NAME, String.format("code: %d", mStatusCode));
+	
+	    	// Get content
+		    StringBuilder sb = new StringBuilder();
+			try {
+				InputStream is = response.getEntity().getContent();
+		        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8"), 8);
+	
+				String line = null;
+				while ((line = reader.readLine()) != null) {
+				    sb.append(line + "n");
+				}
+				is.close();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	
+			try {
+				String res = sb.toString();
+				if (mCache != null) {
+					mCache.set(cmd, res);
+				}
+				JSONObject json = new JSONObject(res);
+	
+				// API error
+				if (json.has("error")) {
+					mErrorMessage = json.getJSONObject("error").getString("message");
+					return null;
+				}
+				
+		        if (mStrategy != null) {
+		        	return mStrategy.execute(json);
+		        }
+				
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+	
+	        Log.v(Application.APP_NAME, String.format("Response: %s", sb.toString()));
 		}
-
-        Log.v(Application.APP_NAME, String.format("Response: %s", sb.toString()));
-        
-        if (mStrategy != null) {
-        	return mStrategy.execute(mJson);
-        }
 
         return null;
 	}

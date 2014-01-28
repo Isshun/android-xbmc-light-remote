@@ -87,15 +87,15 @@ public class PlayingFragment extends Fragment implements OnClickListener, IServi
 				mView.findViewById(R.id.layout_no_playing).setVisibility(View.GONE);
 				mView.findViewById(R.id.layout_area).setVisibility(View.VISIBLE);
 
-				((TextView)mView.findViewById(R.id.lb_id)).setText(String.valueOf(movie.movieId));
-				((TextView)mView.findViewById(R.id.lb_label)).setText(movie.label);
-				((TextView)mView.findViewById(R.id.lb_file)).setText(movie.file);
-				((TextView)mView.findViewById(R.id.lb_rating)).setText(String.valueOf(movie.rating));
-				((TextView)mView.findViewById(R.id.lb_playcount)).setText(String.valueOf(movie.playCount));
-				((TextView)mView.findViewById(R.id.lb_duration)).setText(String.valueOf(movie.duration));
+				((TextView)mView.findViewById(R.id.lb_id)).setText(String.valueOf(movie.getMovieId()));
+				((TextView)mView.findViewById(R.id.lb_label)).setText(movie.getTitle());
+				((TextView)mView.findViewById(R.id.lb_file)).setText(movie.getFile());
+				((TextView)mView.findViewById(R.id.lb_rating)).setText(String.valueOf(movie.getRating()));
+				((TextView)mView.findViewById(R.id.lb_playcount)).setText(String.valueOf(movie.getPlayCount()));
+				((TextView)mView.findViewById(R.id.lb_duration)).setText(String.valueOf(movie.getDuration()));
 
 				// Thumbnail path 
-				String thumbnailPath = movie.thumbnailPath; 
+//				String thumbnailPath = movie.thumbnailPath; 
 //				if (movie.thumbnailPath == null) {
 //					ServiceManager.getLibraryService().getMovies(new OnGetMoviesListener() {
 //						@Override
@@ -110,14 +110,14 @@ public class PlayingFragment extends Fragment implements OnClickListener, IServi
 //						}
 //					});
 //				}
-				if (thumbnailPath != null && new File(thumbnailPath).exists()) {
-					ImageView img = (ImageView)mView.findViewById(R.id.img_playing);
-					ImageService.getInstance().showThumb(img, thumbnailPath);
-				}
+//				if (thumbnailPath != null && new File(thumbnailPath).exists()) {
+//					ImageView img = (ImageView)mView.findViewById(R.id.img_playing);
+//					ImageService.getInstance().showThumb(img, thumbnailPath);
+//				}
 				
 				// Seek bar
 				SeekBar progress = (SeekBar)mView.findViewById(R.id.seekProgress);
-				progress.setMax(movie.duration);
+				progress.setMax(movie.getDuration());
 				progress.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 					@Override

@@ -20,7 +20,7 @@ public class PlayerGetPropertiesTask extends HttpTask<PlayingProperties> impleme
 			@Override
 			public PlayingProperties execute(JSONObject obj) {
 				try {
-					return PlayingProperties.Create(mJson.getJSONObject("result"));
+					return PlayingProperties.Create(obj.getJSONObject("result"));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

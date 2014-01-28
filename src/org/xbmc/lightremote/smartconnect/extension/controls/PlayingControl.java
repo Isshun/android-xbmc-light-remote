@@ -79,7 +79,7 @@ public class PlayingControl extends ManagedControlExtension {
         showLayout(R.layout.layout_sw_playing, null);
         
     	MovieModel movie = PlayerService.getInstance().getPlaying();
-    	sendText(R.id.lb_name, movie.label);
+    	sendText(R.id.lb_name, movie.getTitle());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.xbmc.lightremote.activities;
+package org.xbmc.lightremote.activity;
 
 import java.io.File;
 
@@ -10,7 +10,9 @@ import org.xbmc.lightremote.fragment.LibraryFilterFragment.OnCategoryChangeListe
 import org.xbmc.lightremote.fragment.LibraryMoviesFragment;
 import org.xbmc.lightremote.fragment.PlayingFragment;
 import org.xbmc.lightremote.fragment.PlayingGestureFragment;
+import org.xbmc.lightremote.http.HttpTask.HttpTaskListener;
 import org.xbmc.lightremote.http.IServiceListener;
+import org.xbmc.lightremote.http.tasks.PlayerGetCurrentTask;
 import org.xbmc.lightremote.service.ImageService;
 import org.xbmc.lightremote.service.PlayerService;
 
@@ -113,6 +115,27 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 		actions.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actions.setDisplayShowTitleEnabled(false);
 		actions.setListNavigationCallbacks(adapter, callback);
+		
+		// Fill player
+		final TextView lbPlayer = (TextView)findViewById(R.id.lb_player_name);
+		final ImageView btPlayer = (ImageView)findViewById(R.id.bt_player);
+		PlayerGetCurrentTask task = new PlayerGetCurrentTask();
+		task.addListener(new HttpTaskListener<MovieModel>() {
+
+			@Override
+			public void onSuccess(MovieModel movie) {
+				if (movie != null) {
+					lbPlayer.setText(movie.getTitle());
+				}
+			}
+
+			@Override
+			public void onFailed(String message, int code) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		task.run(0);
 	}
 
 	@Override
@@ -268,7 +291,7 @@ public class MainActivity extends SlidingFragmentActivity implements OnClickList
 				MovieModel movie = mService.getPlaying();
 				
 				if (movie != null) {
-					((TextView)view.findViewById(R.id.lb_playing_name)).setText(movie.label);
+					((TextView)view.findViewById(R.id.lb_playing_name)).setText(movie.getTitle());
 
 //					// Thumbnail path 
 //					String thumbnailPath = movie.thumbnailPath; 

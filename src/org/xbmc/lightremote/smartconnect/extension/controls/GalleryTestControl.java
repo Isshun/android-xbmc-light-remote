@@ -160,7 +160,7 @@ public class GalleryTestControl extends ManagedControlExtension {
 				
 			}
 		});
-        service.reqOpen(movie.file);
+        service.reqOpen(movie.getFile());
     }
 
     protected ControlListItem createControlListItem(int location) {
@@ -176,22 +176,22 @@ public class GalleryTestControl extends ManagedControlExtension {
         // Header data
         Bundle headerBundle = new Bundle();
         headerBundle.putInt(Control.Intents.EXTRA_LAYOUT_REFERENCE, R.id.title);
-        headerBundle.putString(Control.Intents.EXTRA_TEXT, movie.label);
+        headerBundle.putString(Control.Intents.EXTRA_TEXT, movie.getTitle());
 
         // Body data
         Bundle bodyBundle = new Bundle();
         bodyBundle.putInt(Control.Intents.EXTRA_LAYOUT_REFERENCE, R.id.body);
-        bodyBundle.putString(Control.Intents.EXTRA_TEXT, mListContent.get(location).file);
+        bodyBundle.putString(Control.Intents.EXTRA_TEXT, mListContent.get(location).getFile());
 
-        Bitmap bitmap = BitmapFactory.decodeFile(movie.thumbnailPath);
-        if (bitmap != null) {
-	        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-	        bitmap.compress(CompressFormat.JPEG, 70, stream);
-	        byte[] data = stream.toByteArray();
-	        Bundle iconBundle = new Bundle();
-	        iconBundle.putInt(Control.Intents.EXTRA_LAYOUT_REFERENCE, R.id.thumbnail);
-	        iconBundle.putByteArray(Control.Intents.EXTRA_DATA, data);
-        }
+//        Bitmap bitmap = BitmapFactory.decodeFile(movie.thumbnailPath);
+//        if (bitmap != null) {
+//	        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//	        bitmap.compress(CompressFormat.JPEG, 70, stream);
+//	        byte[] data = stream.toByteArray();
+//	        Bundle iconBundle = new Bundle();
+//	        iconBundle.putInt(Control.Intents.EXTRA_LAYOUT_REFERENCE, R.id.thumbnail);
+//	        iconBundle.putByteArray(Control.Intents.EXTRA_DATA, data);
+//        }
         
         item.layoutData = new Bundle[2];
         item.layoutData[0] = headerBundle;

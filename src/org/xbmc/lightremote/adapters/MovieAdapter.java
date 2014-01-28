@@ -47,7 +47,7 @@ public class MovieAdapter extends BaseAdapter {
 
 	@Override
 	public long getItemId(int position) {
-		return mMovies != null ? mMovies.get(position).movieId : 0;
+		return mMovies != null ? mMovies.get(position).getMovieId() : 0;
 	}
 
 	@Override
@@ -68,29 +68,19 @@ public class MovieAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 		
-		ImageService.getInstance().showThumb(holder.imgThumb, m.thumbnailPath);
         
 //		if (holder.imgThumb != null && m.thumbnailPath != null && new File(m.thumbnailPath).exists()) {
-		String url = m.thumbnail.replace("image://", "");
-		try {
-			url = URLDecoder.decode(url, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-
-		ImageService.getInstance().showThumb(holder.imgThumb, url);
-		Log.e(Application.APP_NAME, url);
+		ImageService.getInstance().showThumb(holder.imgThumb, m.getThumbnail());
 //		}
 
 		if (holder.lbName != null)
-			holder.lbName.setText(m.label);
+			holder.lbName.setText(m.getTitle());
 
 		return view;
 	}
 
 	public void setData(List<MovieModel> data) {
 		mMovies = data;
-		notifyDataSetChanged();
 	}
 
 	public void setLayout(int layout) {

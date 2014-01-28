@@ -1,5 +1,6 @@
 package org.xbmc.lightremote.http.tasks;
 
+import org.json.JSONObject;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
 
@@ -14,14 +15,14 @@ public class PlayerOpenTask extends HttpTask<Boolean> {
 
 		String params = String.format("{ \"item\": { \"file\": \"%s\" } }", mPath);
 		run("Player.Open", "Open", params);
-	}
+		
+		mStrategy = new HttpTaskStrategy<Boolean>() {
 
-	@Override
-	protected Boolean doInBackground(String... params) {
-		if (super.doInBackground(params)) {
-			return true;
-		}
-		return false;
+			@Override
+			public Boolean execute(JSONObject obj) {
+				return true;
+			}
+		};
 	}
 	
 }

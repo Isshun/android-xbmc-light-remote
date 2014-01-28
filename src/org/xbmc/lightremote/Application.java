@@ -1,5 +1,7 @@
 package org.xbmc.lightremote;
 
+import org.xbmc.lightremote.service.CacheManager;
+
 import android.content.Context;
 
 public class Application extends android.app.Application {
@@ -16,6 +18,7 @@ public class Application extends android.app.Application {
         super.onCreate();
 
         sContext = getApplicationContext();
+        CacheManager.getInstance().setContext(sContext);
     }
 	
     public static Context getContext() {

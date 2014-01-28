@@ -175,7 +175,7 @@ public class PlayerService {
 				mListener.onActionError(GET_PLAYING, message);
 			}
 		});
-		reqPlayers(task);
+		//reqPlayers(task);
 	}
 
 	public void reqProperties() {
@@ -194,7 +194,7 @@ public class PlayerService {
 				mListener.onActionError(GET_PROPERTIES, message);
 			}
 		});
-		reqPlayers(task);
+		//reqPlayers(task);
 	}
 
 	public void reqMoviesLibrary() {

@@ -1,4 +1,4 @@
-package org.xbmc.lightremote.activities;
+package org.xbmc.lightremote.activity;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.xbmc.lightremote.activities;
+package org.xbmc.lightremote.activity;
 
 import org.xbmc.lightremote.R;
 import org.xbmc.lightremote.data.MovieModel;
@@ -27,12 +27,12 @@ public class DetailActivity extends Activity implements OnClickListener, IServic
 		Bundle bundle = getIntent().getExtras();
 		mMovie = bundle.getParcelable("movie");
 		
-		((TextView)findViewById(R.id.lb_id)).setText(String.valueOf(mMovie.movieId));
-		((TextView)findViewById(R.id.lb_label)).setText(mMovie.label);
-		((TextView)findViewById(R.id.lb_file)).setText(mMovie.file);
-		((TextView)findViewById(R.id.lb_rating)).setText(String.valueOf(mMovie.rating));
-		((TextView)findViewById(R.id.lb_playcount)).setText(String.valueOf(mMovie.playCount));
-		((TextView)findViewById(R.id.lb_duration)).setText(String.valueOf(mMovie.duration));
+		((TextView)findViewById(R.id.lb_id)).setText(String.valueOf(mMovie.getMovieId()));
+		((TextView)findViewById(R.id.lb_label)).setText(mMovie.getLabel());
+		((TextView)findViewById(R.id.lb_file)).setText(mMovie.getFile());
+		((TextView)findViewById(R.id.lb_rating)).setText(String.valueOf(mMovie.getRating()));
+		((TextView)findViewById(R.id.lb_playcount)).setText(String.valueOf(mMovie.getPlayCount()));
+		((TextView)findViewById(R.id.lb_duration)).setText(String.valueOf(mMovie.getDuration()));
 
 		findViewById(R.id.bt_play).setOnClickListener(this);
 	}
@@ -41,7 +41,7 @@ public class DetailActivity extends Activity implements OnClickListener, IServic
 	public void onClick(View v) {
 		switch(v.getId()) {
 		case R.id.bt_play:
-			mService.reqOpen(mMovie.file);
+			mService.reqOpen(mMovie.getFile());
 			setResult(1);
 			finish();
 			break;

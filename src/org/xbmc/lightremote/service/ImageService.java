@@ -27,4 +27,12 @@ public class ImageService {
         .into(image);
 	}
 
+	public void showHeader(ImageView image, String url) {
+		Picasso.with(Application.getContext()).setDebugging(true);
+		Picasso.with(Application.getContext())
+        .load(url)
+        .resize(810, 540)
+        .into(image);
+	}
+
 }

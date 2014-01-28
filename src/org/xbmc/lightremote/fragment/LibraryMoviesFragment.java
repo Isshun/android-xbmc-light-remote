@@ -1,11 +1,16 @@
 package org.xbmc.lightremote.fragment;
 
-import org.xbmc.lightremote.MediaActivity;
+import java.util.List;
+
 import org.xbmc.lightremote.R;
-import org.xbmc.lightremote.activities.DetailActivity;
+import org.xbmc.lightremote.activity.DetailActivity;
+import org.xbmc.lightremote.activity.MediaActivity;
 import org.xbmc.lightremote.adapters.MovieAdapter;
+import org.xbmc.lightremote.data.MovieModel;
+import org.xbmc.lightremote.http.HttpTask.HttpTaskListener;
 import org.xbmc.lightremote.http.IServiceListener;
 import org.xbmc.lightremote.service.PlayerService;
+import org.xbmc.lightremote.service.ServiceManager;
 
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -23,21 +28,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.support.v4.app.NotificationCompat.Builder;
 
-public class LibraryMoviesFragment extends Fragment implements IServiceListener, OnItemClickListener, OnClickListener {
-    private NotificationManager	mNotifyManager;
-	private Builder 			mBuilder;
-
-	private PlayerService 		mService;
+public class LibraryMoviesFragment extends Fragment implements OnItemClickListener, OnClickListener {
+    private PlayerService 		mService;
 	private MovieAdapter 		mMovieAdapter;
 	private ProgressBar 		mProgress;
 	private ListView 			mListview;
 	private GridView 			mGridview;
 	private TextView 			mLbError;
 	private View 				mLayoutError;
-
-	private int 				mMoviesCount;
-	private int 				mThumbnailProgress;
-	private int 				mActionRetry;
 	private boolean 			mGridMode = true; 
 
 	@Override
@@ -50,9 +48,6 @@ public class LibraryMoviesFragment extends Fragment implements IServiceListener,
 		//mMovieAdapter.setLayout(R.layout.list_item_movie);
 		mMovieAdapter.setLayout(R.layout.grid_item_movie);
 
-		mService = PlayerService.getInstance();
-		mService.setListener(this);
-		
 		mLbError = (TextView)v.findViewById(R.id.lb_error);
 		mLayoutError = (View)v.findViewById(R.id.layout_error);
 		v.findViewById(R.id.bt_retry).setOnClickListener(this);
@@ -68,20 +63,43 @@ public class LibraryMoviesFragment extends Fragment implements IServiceListener,
 		mGridview.setAdapter(mMovieAdapter);
 		mGridview.setVisibility(View.VISIBLE);
 		
-		
 //    	mNotifyManager = (NotificationManager) getActivity().getSystemService(getActivity().NOTIFICATION_SERVICE);
 //    	mBuilder = new NotificationCompat.Builder(getActivity());
 //    	mBuilder.setContentTitle("Download Thumbnails")
 ////    	    .setContentText("Download in progress")
 //    	    .setSmallIcon(android.R.drawable.ic_dialog_info);
-    	
+
+		refresh();
+		
         return v; 
     }
 	
+	private void refresh() {
+		showProgress();
+
+		ServiceManager.getLibraryService().getMovies(new HttpTaskListener<List<MovieModel>>() {
+
+			@Override
+			public void onSuccess(List<MovieModel> movies) {
+				mMovieAdapter.setData(movies);
+				mMovieAdapter.notifyDataSetChanged();
+				if (mGridMode)
+					showGrid();
+				else
+					showList();
+			}
+
+			@Override
+			public void onFailed(String message, int code) {
+				mLbError.setText(message);
+				showError();
+			}
+		});
+	}
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		mService.reqMoviesLibrary();
 	}
 
 	private void showProgress() {
@@ -113,40 +131,6 @@ public class LibraryMoviesFragment extends Fragment implements IServiceListener,
 	}
 
 	@Override
-	public void onActionStart(int action) {
-		switch (action) {
-			case PlayerService.GET_MOVIES:
-				showProgress();
-			break;
-		}
-	}
-
-	@Override
-	public void onActionError(int action, String message) {
-		switch (action) {
-			case PlayerService.GET_MOVIES:
-				mActionRetry = action;
-				mLbError.setText(message);
-				showError();
-				break;
-		}
-	}
-
-	@Override
-	public void onActionCompleted(int action) {
-		switch (action) {
-			case PlayerService.GET_MOVIES:
-				mMovieAdapter.setData(mService.getMovies());
-				mMovieAdapter.notifyDataSetChanged();
-				if (mGridMode)
-					showGrid();
-				else
-					showList();
-				break;
-		}
-	}
-
-	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
 		//mService.open(adapter.getItem(pos).file);
 		Intent intent = new Intent(getActivity(), MediaActivity.class);
@@ -159,7 +143,7 @@ public class LibraryMoviesFragment extends Fragment implements IServiceListener,
 	public void onClick(View v) {
 		switch (v.getId()) {
 			case R.id.bt_retry:
-				mService.reqMoviesLibrary();
+				refresh();
 			break;
 		}
 	}

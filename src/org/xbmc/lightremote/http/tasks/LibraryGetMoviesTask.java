@@ -11,11 +11,52 @@ import org.xbmc.lightremote.data.MovieModel;
 import org.xbmc.lightremote.http.HttpTask;
 import org.xbmc.lightremote.http.IDownloadTaskDelegate;
 import org.xbmc.lightremote.http.IWebserviceTaskDelegate;
+import org.xbmc.lightremote.service.CacheManager;
+
+import android.util.Log;
 
 public class LibraryGetMoviesTask extends HttpTask<List<MovieModel>> {
 	
+	private String mProperties[] = {
+			"title", 
+		      "genre", 
+		      "year", 
+		      "rating", 
+		      "director", 
+		      "trailer", 
+		      "tagline", 
+		      "plot", 
+		      "plotoutline", 
+		      "originaltitle", 
+		      "lastplayed", 
+		      "playcount", 
+		      "writer", 
+		      "studio", 
+		      "mpaa", 
+		      "cast", 
+		      "country", 
+		      "imdbnumber", 
+		      "runtime", 
+		      "set", 
+		      "showlink", 
+		      "streamdetails", 
+		      "top250", 
+		      "votes", 
+		      "fanart", 
+		      "thumbnail", 
+		      "file", 
+		      "sorttitle", 
+		      "resume", 
+		      "setid", 
+		      "dateadded", 
+		      "tag", 
+		      "art"
+	};
+	
 	public LibraryGetMoviesTask() {
 		super(0);
+		
+		mCache = CacheManager.getInstance();
 		
 		mStrategy = new HttpTaskStrategy<List<MovieModel>>() {
 			@Override
@@ -24,19 +65,19 @@ public class LibraryGetMoviesTask extends HttpTask<List<MovieModel>> {
 			    String cacheDir = Application.getContext().getFilesDir().getAbsolutePath();
 				
 				try {
-					JSONObject result = mJson.getJSONObject("result");
+					JSONObject result = obj.getJSONObject("result");
 					JSONArray array = result.getJSONArray("movies");
 					for (int i = 0; i < array.length(); i++) {
 						JSONObject data = array.getJSONObject(i);
 						
-						MovieModel m = MovieModel.Create(data);
+						MovieModel m = MovieModel.fromJSON(data);
 						
-						// Thumbnail
-						if (m.thumbnail != null) {
-							int start = m.thumbnail.lastIndexOf("%2f");
-							String filename = m.thumbnail.substring(start + 3, m.thumbnail.length() - 5);
-							m.thumbnailPath = String.format("%s/%s.jpg", cacheDir, filename);
-						}
+//						// Thumbnail
+//						if (m.getThumbnail() != null) {
+//							int start = m.getThumbnail().lastIndexOf("%2f");
+//							String filename = m.getThumbnail().substring(start + 3, m.getThumbnail().length() - 5);
+//							m.thumbnailPath = String.format("%s/%s.jpg", cacheDir, filename);
+//						}
 						
 						movies.add(m);
 					}
@@ -51,7 +92,16 @@ public class LibraryGetMoviesTask extends HttpTask<List<MovieModel>> {
 	}
 
 	public void run() {
-		String params = "{ \"properties\" : [\"art\", \"rating\", \"thumbnail\", \"playcount\", \"file\"], \"sort\": { \"order\": \"ascending\", \"method\": \"label\", \"ignorearticle\": true } }";
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (String property: mProperties) {
+			if (!first) sb.append(',');
+			sb.append('"').append(property).append('"');
+			first = false;
+		}
+		
+		String params = "{ \"properties\" : [" + sb.toString() + "], \"sort\": { \"order\": \"ascending\", \"method\": \"label\", \"ignorearticle\": true } }";
+		Log.e("params", "params" + params);
 		run("VideoLibrary.GetMovies", "GetMovies", params);
 	}
 }

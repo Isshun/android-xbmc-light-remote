@@ -153,7 +153,7 @@ public class ListControlExtension extends ManagedControlExtension {
         // to reference the list data
         item.listItemId = position;
 
-        String uri = Uri.fromFile(new File(mListContent.get(position).thumbnailPath)).toString();
+//        String uri = Uri.fromFile(new File(mListContent.get(position).thumbnailPath)).toString();
         int icon = R.drawable.thumbnail_list_item;
         // Icon data
         Bundle iconBundle = new Bundle();
@@ -161,13 +161,13 @@ public class ListControlExtension extends ManagedControlExtension {
 //        iconBundle.putString(Control.Intents.EXTRA_DATA_URI, ExtensionUtils.getUriString(mContext, icon));
 //        iconBundle.putString(Control.Intents.EXTRA_DATA_URI, uri);
         
-        Bitmap bitmap = BitmapFactory.decodeFile(mListContent.get(position).thumbnailPath);
-        if (bitmap != null) {
-        	ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        	bitmap.compress(CompressFormat.JPEG, 70, stream);
-        	byte[] data = stream.toByteArray();
-        	iconBundle.putByteArray(Control.Intents.EXTRA_DATA, data);
-        }
+//        Bitmap bitmap = BitmapFactory.decodeFile(mListContent.get(position).thumbnailPath);
+//        if (bitmap != null) {
+//        	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        	bitmap.compress(CompressFormat.JPEG, 70, stream);
+//        	byte[] data = stream.toByteArray();
+//        	iconBundle.putByteArray(Control.Intents.EXTRA_DATA, data);
+//        }
         
 //        Log.d("XBMC", "path 1 = " + ExtensionUtils.getUriString(mContext, icon));
 //        Log.d("XBMC", "path 2 = " + uri);
@@ -175,12 +175,12 @@ public class ListControlExtension extends ManagedControlExtension {
         // Header data
         Bundle headerBundle = new Bundle();
         headerBundle.putInt(Control.Intents.EXTRA_LAYOUT_REFERENCE, R.id.title);
-        headerBundle.putString(Control.Intents.EXTRA_TEXT, mListContent.get(position).label);
+        headerBundle.putString(Control.Intents.EXTRA_TEXT, mListContent.get(position).getTitle());
 
         // Body data
         Bundle bodyBundle = new Bundle();
         bodyBundle.putInt(Control.Intents.EXTRA_LAYOUT_REFERENCE, R.id.body);
-        bodyBundle.putString(Control.Intents.EXTRA_TEXT, mListContent.get(position).label);
+        bodyBundle.putString(Control.Intents.EXTRA_TEXT, mListContent.get(position).getTitle());
 
         item.layoutData = new Bundle[3];
         item.layoutData[0] = iconBundle;

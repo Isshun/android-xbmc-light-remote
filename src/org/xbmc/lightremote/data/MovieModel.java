@@ -1,5 +1,8 @@
 package org.xbmc.lightremote.data;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,47 +11,52 @@ import android.os.Parcelable;
 
 public class MovieModel implements Parcelable  {
 	
-	public String file;
-	public String label;
-	public String thumbnailPath;
-	public int duration;
-	public int movieId;
-	public int playCount;
-	public double rating;
-	public String thumbnail;
+	private String 	file;
+	private String 	label;
+	private String 	thumbnailPath;
+	private int 	duration;
+	private int 	movieId;
 
-	public static MovieModel Create(JSONObject obj) throws JSONException {
+	public static Parcelable.Creator<MovieModel> getCreator() {
+		return CREATOR;
+	}
+
+	private int 	playCount;
+	private double 	rating;
+	private String 	thumbnail;
+	private String 	poster;
+	private String 	fanart;
+	private String 	plot;
+	private String 	title;
+	private String 	writer;
+	private String 	director;
+
+	public static MovieModel fromJSON(JSONObject obj) throws JSONException {
 		MovieModel m = new MovieModel();
 		
-		// Label
-		if (obj.has("title"))
-			m.label = obj.getString("title");
-		else if (obj.has("label"))
-			m.label = obj.getString("label");
+		// Id
+		m.movieId = getInt(obj, "movieid");
+		if (m.movieId == 0) {
+			m.movieId = getInt(obj, "id");
+		}
 
-		// Thumbnail
-		if (obj.has("thumbnail")) {
-			m.thumbnail = obj.getString("thumbnail");
+		// Properties
+		m.title= getString(obj, "title");
+		m.label = getString(obj, "label");
+		m.thumbnail = cleanUrl(getString(obj, "thumbnail"));
+		m.plot = getString(obj, "plot");
+		m.director= getString(obj, "director");
+		m.writer= getString(obj, "writer");
+		m.playCount = getInt(obj, "playcount");
+		m.rating = obj.getDouble("rating");
+		m.file = getString(obj, "file");
+		
+		if (obj.has("art")) {
+			JSONObject art = obj.getJSONObject("art");
+			m.poster = cleanUrl(getString(art, "poster"));
+			m.fanart = cleanUrl(getString(art, "fanart"));
 		}
 		
-		// Id
-		if (obj.has("movieid"))
-			m.movieId = obj.getInt("movieid");
-		else if (obj.has("id"))
-			m.movieId = obj.getInt("id");
-		
-		// Playcount
-		if (obj.has("playcount"))
-			m.playCount = obj.getInt("playcount");
-		
-		// Rating
-		if (obj.has("rating"))
-			m.rating = obj.getDouble("rating");
-		
-		//  File
-		if (obj.has("file"))
-			m.file = obj.getString("file");
-
 		// Streamdetails
 		if (obj.has("streamdetails")) {
 			JSONObject streamdetails = obj.getJSONObject("streamdetails");
@@ -64,6 +72,41 @@ public class MovieModel implements Parcelable  {
 		return m;
 	}
 
+	private static int getInt(JSONObject obj, String key) {
+		if (obj.has(key)) {
+			try {
+				return obj.getInt(key);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		return 0;
+	}
+
+	private static String getString(JSONObject obj, String key) {
+		if (obj.has(key)) {
+			try {
+				return obj.getString(key);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	private static String cleanUrl(String url) {
+		if (url != null) {
+			url = url.replace("image://", "");
+			try {
+				url = URLDecoder.decode(url, "UTF-8");
+				return url;
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
 	public MovieModel() {
 	}
 	
@@ -71,6 +114,7 @@ public class MovieModel implements Parcelable  {
 		this.file= in.readString();
 		this.label = in.readString();
 		this.thumbnailPath = in.readString();
+		this.thumbnail = in.readString();
 		this.duration = in.readInt();
 		this.movieId = in.readInt();
 		this.playCount = in.readInt();
@@ -78,11 +122,11 @@ public class MovieModel implements Parcelable  {
 	}
 
 	@Override
-	public void writeToParcel(Parcel dest, int flags)
-	{
+	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(file);
 		dest.writeString(label);
 		dest.writeString(thumbnailPath);
+		dest.writeString(thumbnail);
 		dest.writeInt(duration);
 		dest.writeInt(movieId);
 		dest.writeInt(playCount);
@@ -108,4 +152,61 @@ public class MovieModel implements Parcelable  {
 			return new MovieModel[size];
 		}
 	};
+
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+	public String getFanart() {
+		return fanart;
+	}
+	
+	public String getFile() {
+		return file;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public String getThumbnailPath() {
+		return thumbnailPath;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public int getMovieId() {
+		return movieId;
+	}
+
+	public int getPlayCount() {
+		return playCount;
+	}
+
+	public double getRating() {
+		return rating;
+	}
+
+	public String getPoster() {
+		return poster;
+	}
+
+	public String getPlot() {
+		return plot;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public String getWriter() {
+		return writer;
+	}
+
+	public String getDirector() {
+		return director;
+	}
+
 }

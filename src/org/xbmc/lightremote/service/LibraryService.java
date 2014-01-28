@@ -22,7 +22,7 @@ public abstract class LibraryService {
 	private FileDownloadTask mFileDownloadTask;
 
 	public abstract void getMovies(HttpTaskListener<List<MovieModel>> listener);
-	public abstract void getMovie(HttpTaskListener<MovieModel> listener);
+	public abstract void getMovie(HttpTaskListener<MovieModel> listener, int movieId);
 	
 //	public void download(final IDownloadTaskDelegate mFileDelegate, String thumbnail, final String thumbnailPath) {
 ////		Log.i(App.APP_NAME, String.format("file download: %s", thumbnail));

@@ -21,7 +21,7 @@ public class PlayerGetActivesTask extends HttpTask<Integer> {
 			@Override
 			public Integer execute(JSONObject obj) {
 				try {
-					JSONArray results = mJson.getJSONArray("result");
+					JSONArray results = obj.getJSONArray("result");
 					if (results.length() > 0) {
 						return results.getJSONObject(0).getInt("playerid");
 					}

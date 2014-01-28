@@ -20,7 +20,7 @@ public class PlayerGetCurrentTask extends HttpTask<MovieModel> implements IPlaye
 			@Override
 			public MovieModel execute(JSONObject obj) {
 				try {
-					return MovieModel.Create(mJson.getJSONObject("result").getJSONObject("item"));
+					return MovieModel.fromJSON(obj.getJSONObject("result").getJSONObject("item"));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

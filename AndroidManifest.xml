@@ -10,7 +10,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.sonyericsson.extras.liveware.aef.EXTENSION_PERMISSION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:name="org.xbmc.lightremote.Application"
@@ -19,7 +22,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="org.xbmc.lightremote.activities.MainActivity"
+            android:name="org.xbmc.lightremote.activity.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance" >
             <intent-filter>
@@ -29,26 +32,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.xbmc.lightremote.activities.DetailActivity"
+            android:name="org.xbmc.lightremote.activity.DetailActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="org.xbmc.lightremote.activities.PlayingActivity"
+            android:name="org.xbmc.lightremote.activity.PlayingActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance" >
         </activity>
         <activity
-            android:name="org.xbmc.lightremote.activities.LibraryMoviesActivity"
+            android:name="org.xbmc.lightremote.activity.LibraryMoviesActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance" >
         </activity>
         <activity
-            android:name="org.xbmc.lightremote.activities.LibrarySeriesActivity"
+            android:name="org.xbmc.lightremote.activity.LibrarySeriesActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance" >
         </activity>
         <activity
-            android:name="org.xbmc.lightremote.activities.SettingsActivity"
+            android:name="org.xbmc.lightremote.activity.SettingsActivity"
             android:label="@string/app_name" >
         </activity>
 
@@ -94,7 +97,7 @@
         </receiver>
 
         <activity
-            android:name="org.xbmc.lightremote.MediaActivity"
+            android:name="org.xbmc.lightremote.activity.MediaActivity"
             android:label="@string/title_activity_media" >
         </activity>
     </application>
