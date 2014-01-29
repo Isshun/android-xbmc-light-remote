@@ -11,9 +11,4 @@
         tools:context=".MediaActivity" >
     </android.support.v4.view.ViewPager>
 
-    <com.viewpagerindicator.TitlePageIndicator
-        android:id="@+id/indicator"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-
 </FrameLayout>

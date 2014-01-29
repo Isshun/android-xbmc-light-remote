@@ -55,8 +55,8 @@ public class MediaActivity extends FragmentActivity {
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
-		TitlePageIndicator titleIndicator = (TitlePageIndicator)findViewById(R.id.indicator);
-		titleIndicator.setViewPager(mViewPager);
+//		TitlePageIndicator titleIndicator = (TitlePageIndicator)findViewById(R.id.indicator);
+//		titleIndicator.setViewPager(mViewPager);
 		
 		ServiceManager.getLibraryService().getMovies(new HttpTaskListener<List<MovieModel>>() {
 

@@ -13,8 +13,12 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.Listener;
 import com.squareup.picasso.Picasso.Builder;
 
+import android.content.Context;
+import android.graphics.Point;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 public class ImageService {
@@ -53,9 +57,16 @@ public class ImageService {
 	}
 
 	public void showHeader(ImageView image, String url) {
+		WindowManager wm = (WindowManager)Application.getContext().getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		final int width = size.x;
+		final int height = (int) Application.getContext().getResources().getDimension(R.dimen.media_header_image_height);
+		
 		mPicasso
         .load(url)
-        .resize(810, 540)
+        .resize(width, height)
         .into(image);
 	}
 
